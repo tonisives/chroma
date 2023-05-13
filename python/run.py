@@ -36,8 +36,6 @@ if count == 0:
     ids=["id1"]
   )
 
-print(f"count {count}")
-
-
+print(f"collection items count {count}")
 
 print("finished")
