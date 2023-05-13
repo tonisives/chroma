@@ -5,7 +5,7 @@ networks:
     driver: bridge
 services:
   server:
-    image: ghcr.io/chroma-core/chroma:0.3.22
+    image: ghcr.io/chroma-core/chroma:latest
     volumes:
       - index_data:/chroma/.chroma/index
     environment:
