@@ -8,8 +8,11 @@ openai_ef = embedding_functions.OpenAIEmbeddingFunction(
                 model_name="text-embedding-ada-002"
             )
 
+# host = "localhost"
+host = "18.246.10.12"
+
 client = chromadb.Client(Settings(chroma_api_impl="rest",
-                                        chroma_server_host="localhost",
+                                        chroma_server_host=host,
                                         chroma_server_http_port="8000"
                                     ))
 
@@ -28,13 +31,14 @@ count = collection.count()
 if count == 0:
   documents = ["hello world"]
   embeddings = openai_ef(documents)
-  print(f"add embeddings: {embeddings.count()}")
+  print(f"add embeddings: {len(embeddings)}")
   collection.add(
     documents=documents,
     embeddings=embeddings,
     metadatas=[{"name": "hello world"}],
     ids=["id1"]
   )
+  count = collection.count()
 
 print(f"collection items count {count}")
 
