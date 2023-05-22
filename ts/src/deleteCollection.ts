@@ -1,4 +1,6 @@
-import { client, collection_name, ef } from "./config.js";
+import { config } from "./config.js";
+
+let { client, collection_name, ef } = config
 
 console.log("deleting collection");
 

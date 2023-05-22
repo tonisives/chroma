@@ -15,6 +15,8 @@ export type Config = {
 }
 
 const openAiConfig = (): Config => {
+  console.log("using openai")
+
   let model_name = "text-embedding-ada-002"
   let model_hash = calcHash(model_name)
 
@@ -33,6 +35,7 @@ const openAiConfig = (): Config => {
 }
 
 const cohereConfig = () => {
+  console.log("using cohere")
   let model_name = "cohere-large"
   let model_hash = calcHash(model_name)
 
@@ -50,5 +53,5 @@ const cohereConfig = () => {
 }
 
 
-export let config = openAiConfig()
+export let config = cohereConfig()
 
