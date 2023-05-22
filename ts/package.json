@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "name": "ts",
+  "packageManager": "yarn@3.5.0",
+  "dependencies": {
+    "chromadb": "1.4.1",
+    "openai": "^3.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.2.1",
+    "typescript": "^5.0.4"
+  }
+}
