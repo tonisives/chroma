@@ -1,7 +1,9 @@
-import { client, collection_name, ef } from "./config.js";
-import embs from "../embs.json";
+import { config } from "./config.js";
+import embs from "./sample/embs.json";
 
-console.log("getting collection");
+let { client, collection_name, ef } = config
+
+console.log("start");
 
 let collection = await client.getOrCreateCollection(collection_name, undefined, ef)
 

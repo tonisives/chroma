@@ -5,13 +5,23 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "addEmbs",
+      "name": "addEmbsJson",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",
       "runtimeExecutable": "tsx",
       "runtimeArgs": [
-        "./src/addEmbs.ts"
+        "./src/addEmbsJson.ts"
+      ]
+    },
+    {
+      "name": "addEmbsFile",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/addEmbsFile.ts"
       ]
     },
     {
