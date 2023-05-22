@@ -22,3 +22,7 @@ dist
 terraform.tfstate
 .hypothesis/
 .idea
+.yarn
+node_modules
+
+

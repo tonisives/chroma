@@ -2,8 +2,13 @@ import chromadb
 from chromadb.config import Settings
 from chromadb.utils import embedding_functions
 import os
+import json
 
-collection_name = "ah-00000000-048b-2023-05-venus"
+import sys
+
+collection_name = sys.argv[1]
+
+print(f"getting count for collection_name: {collection_name}")
 
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
                 api_key=os.environ.get("OPENAI_API_KEY"),
@@ -23,25 +28,14 @@ try:
   print(f"existing collection: {collection}")
 except:
   collection = None
+  print("collection doesn't exist")
+  exit(0)
 
-if collection is None:
-  print("existing is None, create a new collection")
-  collection = client.create_collection(name=collection_name, embedding_function=openai_ef)
 
 count = collection.count()
-
-if count == 0:
-  documents = ["hello world"]
-  embeddings = openai_ef(documents)
-  print(f"add embeddings: {len(embeddings)}")
-  collection.add(
-    documents=documents,
-    embeddings=embeddings,
-    metadatas=[{"name": "hello world"}],
-    ids=["id1"]
-  )
-  count = collection.count()
-
 print(f"collection items count {count}")
+items = collection.peek(100)
+
+print(f"first 100 items:\n {json.dumps(items, indent=2)}")
 
 print("finished")

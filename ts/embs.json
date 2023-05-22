@@ -1,0 +1,1046 @@
+[
+  {
+    "pageContent": "# Juicebox Buyback Delegate audit details\n\n- Total Prize Pool: $24,500 USDC \n  - HM awards: 15,000 USDC\n  - QA report awards: $1,000 USDC \n  - Bot Race report awards: $2,000 USDC\n  - Gas report awards: $2,000 USDC \n  - Judge awards: $2,400 USDC\n  - Lookout awards: $1,600 USDC \n  - Scout awards: $500 USDC\n- Join [C4 Discord](https://discord.gg/code4rena) to register\n- Submit findings [using the C4 form](https://code4rena.com/contests/2023-05-juicebox-buyback-delegate/submit)\n- [Read our guidelines for more details](https://docs.code4rena.com/roles/wardens)\n- Starts May 18, 2023 20:00 UTC\n- Ends May 22, 2023 20:00 UTC\n\n## Automated Findings / Publicly Known Issues\n\nAutomated findings output for the audit can be found [here](https://gist.github.com/itsmetechjay/2efc963de59bcad62e69de48171d10ca).\n\n*Note for C4 wardens: Anything included in the automated findings output is considered a publicly known issue and is ineligible for awards.*\n\n# Overview",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 23
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "*Note for C4 wardens: Anything included in the automated findings output is considered a publicly known issue and is ineligible for awards.*\n\n# Overview\n\n`juice-buyback` provides a [data source](https://docs.juicebox.money/dev/learn/glossary/data-source/) and [delegate](https://docs.juicebox.money/dev/learn/glossary/delegate/) which maximise the [project token](https://docs.juicebox.money/dev/learn/glossary/tokens/) received by the contributor when they call `pay` on the [terminal](https://docs.juicebox.money/dev/learn/glossary/payment-terminal/). In order to do so, the delegate will either mint new tokens from the project (\"vanilla\" path, bypassing the delegate) or use the funds from `pay` to buy existing tokens in a Uniswap V3 pool (\"buyback\" path), depending on the best quote available at the time of the call.\n\nThis first iteration is optimised for ETH as terminal token.",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 23,
+          "to": 29
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "This first iteration is optimised for ETH as terminal token.\n\nTo learn more about the Juicebox protocol, see our [docs](https://docs.juicebox.money/). To learn more about `juice-buyback`, see its [README](https://github.com/code-423n4/2023-05-juicebox/blob/main/juice-buyback/README.md).\n\n# Scope",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 29,
+          "to": 33
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "# Scope\n\n| Contract | SLOC | Purpose | Libraries used |  \n| ----------- | ----------- | ----------- | ----------- |\n| [`juice-buyback/contracts/JBXBuybackDelegate.sol`](https://github.com/code-423n4/2023-05-juicebox/blob/main/juice-buyback/contracts/JBXBuybackDelegate.sol) | 160 | The buyback delegate | [`@openzeppelin/*`](https://openzeppelin.com/contracts/) [`@jbx-protocol/juice-contracts-v3/*`](https://github.com/jbx-protocol/juice-contracts-v3) [`@paulrberg/contracts/math/PRBMath.sol`](https://github.com/PaulRBerg/prb-math) [`@uniswap/v3-core/*`](https://github.com/Uniswap/v3-core) [`@uniswap/v3-periphery/contracts/interfaces/external/IWETH9.sol`](https://github.com/Uniswap/v3-periphery/blob/main/contracts/interfaces/external/IWETH9.sol) |\n\n## Out of scope\n\nOther contracts.\n\n# Additional Context\n\n## Scoping Details",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 33,
+          "to": 45
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "```\n- If you have a public code repo, please share it here: [`juice-buyback`](https://github.com/jbx-protocol/juice-buyback/)\n- How many contracts are in scope?: 1\n- Total SLoC for these contracts?:  160\n- How many external imports are there?:  17\n- How many separate interfaces and struct definitions are there for the contracts within scope?:  1\n- Does most of your code generally use composition or inheritance?: Inheritance\n- How many external calls?: 5\n- What is the overall line coverage percentage provided by your tests?: 100\n- Is there a need to understand a separate part of the codebase / get context in order to audit this part of the protocol?: yes\n- Please describe required context: [Payment terminals](https://docs.juicebox.money/dev/learn/glossary/payment-terminal/), [pay delegates](https://docs.juicebox.money/dev/build/treasury-extensions/pay-delegate/), and [data sources](https://docs.juicebox.money/dev/learn/glossary/data-source/).\n- Does it use an oracle?: no",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 47,
+          "to": 58
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "- Does it use an oracle?: no\n- Does the token conform to the ERC20 standard?: yes\n- Are there any novel or unique curve logic or mathematical models?: no\n- Does it use a timelock function?: no\n- Is it an NFT?: no\n- Does it have an AMM?: no\n- Is it a fork of a popular project?: no\n- Does it use rollups?: no\n- Is it multi-chain?: no\n- Does it use a side-chain?: no\n```",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 58,
+          "to": 68
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "## About Juicebox\n\nThe Juicebox protocol is a programmable treasury. Projects can use it to configure how its tokens should be minted when it receives funds, and under what conditions those funds can be distributed to preprogrammed addresses or reclaimed by its community. These rules can evolve over funding cycles, allowing people to bootstrap open-ended projects and add structure, constraints, extensions, and incentives over time as needed.\n\nWhen people pay a project, they interact with a [payment terminal](https://docs.juicebox.money/dev/learn/glossary/payment-terminal/), a contract which controls the inflows and outflows of a certain token for every project which uses it. Projects can override the default payment terminal behavior through the use of data sources and delegates.",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 70,
+          "to": 74
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "A [data source](https://docs.juicebox.money/dev/learn/glossary/data-source/) is used to provide custom data to a payment terminal's `pay` (or `redeem`) function. Data sources must adhere to [`IJBFundingCycleDataSource`](https://docs.juicebox.money/dev/api/interfaces/ijbfundingcycledatasource/).\n\nA [pay delegate](https://docs.juicebox.money/dev/learn/glossary/delegate/) includes a custom `didPay(...)` hook that will execute after all of the default protocol pay logic has successfully executed in the terminal contract. Pay delegates must adhere to [`IJBPayDelegate`](https://docs.juicebox.money/dev/api/interfaces/ijbpaydelegate/).\n\n`juice-buyback` is an `IJBPayDelegate` *and* an `IJBFundingCycleDataSource`.\n\nYou can find the previous Code4rena contest covering the protocol, inlcuding the payment terminal [here](https://code4rena.com/reports/2022-10-juicebox/).\n\n# Tests",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 76,
+          "to": 84
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "You can find the previous Code4rena contest covering the protocol, inlcuding the payment terminal [here](https://code4rena.com/reports/2022-10-juicebox/).\n\n# Tests\n\nTo run this repo, you'll need [Foundry](https://book.getfoundry.sh/) and [NodeJS](https://nodejs.dev/en/learn/how-to-install-nodejs/) installed.\n\nTo install dependencies and run the tests:\n\n```bash\n# Clone the repository\ngit clone https://github.com/code-423n4/2023-05-juicebox.git\n\n# Navigate to the buyback delegate's directory\ncd 2023-05-juicebox/juice-buyback\n\n# Install dependencies\nnpm install\n\n# Run tests\nforge test --gas-report\n```",
+    "metadata": {
+      "source": "README.md",
+      "loc": {
+        "lines": {
+          "from": 84,
+          "to": 104
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "# Juice Buyback Delegate - ETH-Project token\n\n## Summary\n\nProvides a datasource and delegate which maximise the project token received by the contributor when they call `pay` on the terminal. In order to do so, the delegate will either mint new tokens (\"vanilla\" path, bypassing the delegate) or swap existing token in an Uniswap V3 pool (\"buyback\" path), depending on the best quote available at the time of the call.\n\nThis first iteration is optimised for ETH as terminal token.",
+    "metadata": {
+      "source": "juice-buyback/README.md",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 7
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "## Design\n### Flow\n- The frontend passes a quote (as an amount received for a given amount send) from the correct Uniswap V3 pool, as well as a maximum slippage allowed (in 1/10000th) while calling `pay(..)`. These should be encoded as uint256 and passed as third and fourth words of the `pay(..)` metadata parameter (the first 2 32bytes being reserved for the protocol).\n- `Pay(..)` will use the buyback delegate as datasource and, based on the quote (taking slippage into account) and the funding cycle weight, will either mint (bypassing the delegate and using the regular terminal logic) or swap (signaling this by returning the delegate address and a 0 weight to the terminal).\n- If swap is privilegied, the terminal will call the delegate's `didPay` method, which will wrap and swap the eth, and transfer the correct amount of project tokens to the contributor (ie the non-reserved ones).",
+    "metadata": {
+      "source": "juice-buyback/README.md",
+      "loc": {
+        "lines": {
+          "from": 9,
+          "to": 13
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "NB: The whole amount contributed will be swapped, including what should be considered as reserved. The delegate will then burn/mint/burn again the non-transfered to account for the reserved tokens (ie burn them all, then mint an amount which will return the correct amount of reserved token, then burn the non-reserved token just minted)\n- In case of failure of the swap (eg max slippage, low liquidity), the delegate will mint the tokens instead (using the original funding cycle weight and reserved rate).",
+    "metadata": {
+      "source": "juice-buyback/README.md",
+      "loc": {
+        "lines": {
+          "from": 14,
+          "to": 15
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "### Contracts/Interfaces\n- JBXBuyBackDelegate: the datasource, pay delegate and uniswap pool callback contract\n\n## Usage\nAnyone can deploy this delegate using the provided forge script.\nTo run this repo, you'll need [Foundry](https://book.getfoundry.sh/) and [NodeJS](https://nodejs.dev/en/learn/how-to-install-nodejs/) installed.\nInstall the dependencies with `npm install`, you should then be able to run the tests using `forge test --gas-report` or deploy a new delegate using `forge script Deploy` (and the correct arguments, based on the chain and key you want to use - see the [Foundry docs](https://book.getfoundry.sh/)).\n\n## Use-case\nMaximizing the project token received by the contributor while leveling the funding cycle/secondary market price.",
+    "metadata": {
+      "source": "juice-buyback/README.md",
+      "loc": {
+        "lines": {
+          "from": 17,
+          "to": 26
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "## Use-case\nMaximizing the project token received by the contributor while leveling the funding cycle/secondary market price.\n\n## Risk & trade-offs\n - This delegate is, for now, only compatible with ETH as terminal token.\n - This delegate relies on the liquidity available in an Uniswap V3. If LP migrate to a new pool or another DEX, this delegate would need to be redeployed.\n - A low liquidity might, if the max slippage isn't set properly, lead to an actual amount of token received lower than expected.",
+    "metadata": {
+      "source": "juice-buyback/README.md",
+      "loc": {
+        "lines": {
+          "from": 26,
+          "to": 32
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport \"@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBController3_1.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleDataSource.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayoutRedemptionPaymentTerminal3_1.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleBallot.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/libraries/JBFundingCycleMetadataResolver.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/libraries/JBTokens.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/structs/JBDidPayData.sol\";\nimport \"@jbx-protocol/juice-contracts-v3/contracts/structs/JBPayParamsData.sol\";",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 13
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import \"@openzeppelin/contracts/access/Ownable.sol\";\nimport \"@openzeppelin/contracts/interfaces/IERC20.sol\";\n\nimport \"@paulrberg/contracts/math/PRBMath.sol\";\n\nimport \"@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol\";\nimport \"@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol\";\nimport \"@uniswap/v3-core/contracts/libraries/TickMath.sol\";\n\nimport \"./interfaces/external/IWETH9.sol\";\n\n/**\n * @custom:benediction DEVS BENEDICAT ET PROTEGAT CONTRACTVS MEAM\n *\n * @title  Buyback Delegate\n *\n * @notice Datasource and delegate allowing pay beneficiary to get the highest amount\n *         of project tokens between minting using the project weigh and swapping in a\n *         given Uniswap V3 pool\n *\n * @dev    This only supports ETH terminal. The pool is fixed, if a new pool offers deeper\n *         liquidity, this delegate needs to be redeployed.\n */",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 15,
+          "to": 37
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "contract JBXBuybackDelegate is IJBFundingCycleDataSource, IJBPayDelegate, IUniswapV3SwapCallback, Ownable {\n    using JBFundingCycleMetadataResolver for JBFundingCycle;\n\n    //*********************************************************************//\n    // --------------------------- custom errors ------------------------- //\n    //*********************************************************************//\n\n    error JuiceBuyback_Unauthorized();\n    error JuiceBuyback_MaximumSlippage();\n\n    //*********************************************************************//\n    // -----------------------------  events ----------------------------- //\n    //*********************************************************************//\n\n    event JBXBuybackDelegate_Swap(uint256 projectId, uint256 amountEth, uint256 amountOut);\n    event JBXBuybackDelegate_Mint(uint256 projectId);",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 39,
+          "to": 54
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "event JBXBuybackDelegate_Swap(uint256 projectId, uint256 amountEth, uint256 amountOut);\n    event JBXBuybackDelegate_Mint(uint256 projectId);\n\n    //*********************************************************************//\n    // --------------------- private constant properties ----------------- //\n    //*********************************************************************//\n\n    /**\n     * @notice Address project token < address terminal token ?\n     */\n    bool private immutable _projectTokenIsZero;\n\n    /**\n     * @notice The unit of the max slippage (expressed in 1/10000th)\n     */\n    uint256 private constant SLIPPAGE_DENOMINATOR = 10000;\n\n    //*********************************************************************//\n    // --------------------- public constant properties ------------------ //\n    //*********************************************************************//",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 54,
+          "to": 73
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "/**\n     * @notice The project token address\n     * \n     * @dev In this context, this is the tokenOut\n     */\n    IERC20 public immutable projectToken;\n\n    /**\n     * @notice The uniswap pool corresponding to the project token-other token market\n     *         (this should be carefully chosen liquidity wise)\n     */\n    IUniswapV3Pool public immutable pool;\n\n    /**\n     * @notice The project terminal using this extension\n     */\n    IJBPayoutRedemptionPaymentTerminal3_1 public immutable jbxTerminal;\n\n    /**\n     * @notice The WETH contract\n     */\n    IWETH9 public immutable weth;\n\n    //*********************************************************************//\n    // --------------------- private stored properties ------------------- //\n    //*********************************************************************//\n\n    /**\n     * @notice The amount of token created if minted is prefered\n     * \n     * @dev    This is a mutex 1-x-1\n     */\n    uint256 private mintedAmount = 1;",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 75,
+          "to": 107
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "/**\n     * @notice The amount of token created if minted is prefered\n     * \n     * @dev    This is a mutex 1-x-1\n     */\n    uint256 private mintedAmount = 1;\n\n    /**\n     * @notice The current reserved rate\n     * \n     * @dev    This is a mutex 1-x-1\n     */\n    uint256 private reservedRate = 1;\n\n    /**\n     * @dev No other logic besides initializing the immutables\n     */\n    constructor(\n        IERC20 _projectToken,\n        IWETH9 _weth,\n        IUniswapV3Pool _pool,\n        IJBPayoutRedemptionPaymentTerminal3_1 _jbxTerminal\n    ) {\n        projectToken = _projectToken;\n        pool = _pool;\n        jbxTerminal = _jbxTerminal;\n        _projectTokenIsZero = address(_projectToken) < address(_weth);\n        weth = _weth;\n    }\n\n    //*********************************************************************//\n    // ---------------------- external functions ------------------------- //\n    //*********************************************************************//",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 107,
+          "to": 139
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "/**\n     * @notice The datasource implementation\n     *\n     * @param  _data the data passed to the data source in terminal.pay(..). _data.metadata need to have the Uniswap quote\n     * @return weight the weight to use (the one passed if not max reserved rate, 0 if swapping or the one corresponding\n     *         to the reserved token to mint if minting)\n     * @return memo the original memo passed\n     * @return delegateAllocations The amount to send to delegates instead of adding to the local balance.\n     */\n    function payParams(JBPayParamsData calldata _data)\n        external\n        override\n        returns (uint256 weight, string memory memo, JBPayDelegateAllocation[] memory delegateAllocations)\n    {\n        // Find the total number of tokens to mint, as a fixed point number with 18 decimals\n        uint256 _tokenCount = PRBMath.mulDiv(_data.amount.value, _data.weight, 10 ** 18);",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 141,
+          "to": 156
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Unpack the quote from the pool, given by the frontend\n        (,, uint256 _quote, uint256 _slippage) = abi.decode(_data.metadata, (bytes32, bytes32, uint256, uint256));\n\n        // If the amount swapped is bigger than the lowest received when minting, use the swap pathway\n        if (_tokenCount < _quote - (_quote * _slippage / SLIPPAGE_DENOMINATOR)) {\n            // Pass the quote and reserve rate via a mutex\n            mintedAmount = _tokenCount;\n            reservedRate = _data.reservedRate;\n\n            // Return this delegate as the one to use, and do not mint from the terminal\n            delegateAllocations = new JBPayDelegateAllocation[](1);\n            delegateAllocations[0] =\n                JBPayDelegateAllocation({delegate: IJBPayDelegate(this), amount: _data.amount.value});\n\n            return (0, _data.memo, delegateAllocations);\n        }",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 158,
+          "to": 173
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "return (0, _data.memo, delegateAllocations);\n        }\n\n        // If minting, do not use this as delegate\n        return (_data.weight, _data.memo, new JBPayDelegateAllocation[](0));\n    }",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 173,
+          "to": 178
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// If minting, do not use this as delegate\n        return (_data.weight, _data.memo, new JBPayDelegateAllocation[](0));\n    }\n\n    /**\n     * @notice Delegate to either swap to the beneficiary or mint to the beneficiary\n     *\n     * @dev    This delegate is called only if the quote for the swap is bigger than the lowest received when minting.\n     *         If the swap reverts (slippage, liquidity, etc), the delegate will then mint the same amount of token as\n     *         if the delegate was not used.\n     *         If the beneficiary requests non claimed token, the swap is not used (as it is, per definition, claimed token)\n     *\n     * @param _data the delegate data passed by the terminal\n     */\n    function didPay(JBDidPayData calldata _data) external payable override {\n        // Access control as minting is authorized to this delegate\n        if (msg.sender != address(jbxTerminal)) revert JuiceBuyback_Unauthorized();",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 178,
+          "to": 194
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Retrieve the number of token created if minting and reset the mutex (not exposed in JBDidPayData)\n        uint256 _tokenCount = mintedAmount;\n        mintedAmount = 1;\n\n        // Retrieve the fc reserved rate and reset the mutex\n        uint256 _reservedRate = reservedRate;\n        reservedRate = 1;\n\n        // The minimum amount of token received if swapping\n        (,, uint256 _quote, uint256 _slippage) = abi.decode(_data.metadata, (bytes32, bytes32, uint256, uint256));\n        uint256 _minimumReceivedFromSwap = _quote - (_quote * _slippage / SLIPPAGE_DENOMINATOR);\n\n        // Pick the appropriate pathway (swap vs mint), use mint if non-claimed prefered\n        if (_data.preferClaimedTokens) {\n            // Try swapping\n            uint256 _amountReceived = _swap(_data, _minimumReceivedFromSwap, _reservedRate);",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 196,
+          "to": 211
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// If swap failed, mint instead, with the original weight + add to balance the token in\n            if (_amountReceived == 0) _mint(_data, _tokenCount);\n        } else {\n            _mint(_data, _tokenCount);\n        }\n    }\n\n    /**\n     * @notice The Uniswap V3 pool callback (where token transfer should happens)\n     *\n     * @dev    Slippage controle is achieved here\n     */\n    function uniswapV3SwapCallback(int256 amount0Delta, int256 amount1Delta, bytes calldata data) external override {\n        // Check if this is really a callback\n        if (msg.sender != address(pool)) revert JuiceBuyback_Unauthorized();\n\n        // Unpack the data\n        (uint256 _minimumAmountReceived) = abi.decode(data, (uint256));\n\n        // Assign 0 and 1 accordingly\n        uint256 _amountReceived = uint256(-(_projectTokenIsZero ? amount0Delta : amount1Delta));\n        uint256 _amountToSend = uint256(_projectTokenIsZero ? amount1Delta : amount0Delta);",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 213,
+          "to": 234
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Revert if slippage is too high\n        if (_amountReceived < _minimumAmountReceived) revert JuiceBuyback_MaximumSlippage();\n\n        // Wrap and transfer the weth to the pool\n        weth.deposit{value: _amountToSend}();\n        weth.transfer(address(pool), _amountToSend);\n    }\n\n    function redeemParams(JBRedeemParamsData calldata _data)\n        external\n        override\n        returns (uint256 reclaimAmount, string memory memo, JBRedemptionDelegateAllocation[] memory delegateAllocations)\n    {}\n\n    //*********************************************************************//\n    // ---------------------- internal functions ------------------------- //\n    //*********************************************************************//",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 236,
+          "to": 252
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "/**\n     * @notice Swap the terminal token to receive the project toke_beforeTransferTon\n     *\n     * @dev    This delegate first receive the whole amount of project token,\n     *         then send the non-reserved token to the beneficiary,\n     *         then burn the rest of this delegate balance (ie the amount of reserved token),\n     *         then mint the same amount as received (this will add the reserved token, following the fc rate)\n     *         then burn the difference (ie this delegate balance)\n     *         -> End result is having the correct balances (beneficiary and reserve), according to the reserve rate\n     *\n     * @param  _data the didPayData passed by the terminal\n     * @param  _minimumReceivedFromSwap the minimum amount received, to prevent slippage\n     */\n    function _swap(JBDidPayData calldata _data, uint256 _minimumReceivedFromSwap, uint256 _reservedRate)\n        internal\n        returns (uint256 _amountReceived)\n    {",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 254,
+          "to": 270
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "*/\n    function _swap(JBDidPayData calldata _data, uint256 _minimumReceivedFromSwap, uint256 _reservedRate)\n        internal\n        returns (uint256 _amountReceived)\n    {\n        // Pass the token and min amount to receive as extra data\n        try pool.swap({\n            recipient: address(this),\n            zeroForOne: !_projectTokenIsZero,\n            amountSpecified: int256(_data.amount.value),\n            sqrtPriceLimitX96: _projectTokenIsZero ? TickMath.MAX_SQRT_RATIO - 1 : TickMath.MIN_SQRT_RATIO + 1,\n            data: abi.encode(_minimumReceivedFromSwap)\n        }) returns (int256 amount0, int256 amount1) {\n            // Swap succeded, take note of the amount of projectToken received (negative as it is an exact input)\n            _amountReceived = uint256(-(_projectTokenIsZero ? amount0 : amount1));\n        } catch {\n            // implies _amountReceived = 0 -> will later mint when back in didPay\n            return _amountReceived;\n        }",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 270,
+          "to": 288
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// The amount to send to the beneficiary\n        uint256 _nonReservedToken = PRBMath.mulDiv(\n            _amountReceived, JBConstants.MAX_RESERVED_RATE - _reservedRate, JBConstants.MAX_RESERVED_RATE\n        );\n\n        // The amount to add to the reserved token\n        uint256 _reservedToken = _amountReceived - _nonReservedToken;\n\n        // Send the non-reserved token to the beneficiary (if any / reserved rate is not max)\n        if (_nonReservedToken != 0) projectToken.transfer(_data.beneficiary, _nonReservedToken);\n\n        // If there are reserved token, add them to the reserve\n        if (_reservedToken != 0) {\n            IJBController controller = IJBController(jbxTerminal.directory().controllerOf(_data.projectId));",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 290,
+          "to": 303
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// 1) Burn all the reserved token, which are in this address -> result: 0 here, 0 in reserve\n            controller.burnTokensOf({\n                _holder: address(this),\n                _projectId: _data.projectId,\n                _tokenCount: _reservedToken,\n                _memo: \"\",\n                _preferClaimedTokens: true\n            });\n\n            // 2) Mint the reserved token with this address as beneficiary -> result: _amountReceived-reserved here, reservedToken in reserve\n            controller.mintTokensOf({\n                _projectId: _data.projectId,\n                _tokenCount: _amountReceived,\n                _beneficiary: address(this),\n                _memo: _data.memo,\n                _preferClaimedTokens: false,\n                _useReservedRate: true\n            });",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 305,
+          "to": 322
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// 3) Burn the non-reserve token which are now left in this address (can be 0) -> result: 0 here, reservedToken in reserve\n            uint256 _nonReservedTokenInContract = _amountReceived - _reservedToken;\n\n            if (_nonReservedTokenInContract != 0) {\n                controller.burnTokensOf({\n                    _holder: address(this),\n                    _projectId: _data.projectId,\n                    _tokenCount: _nonReservedTokenInContract,\n                    _memo: \"\",\n                    _preferClaimedTokens: false\n                });\n            }\n        }\n\n        emit JBXBuybackDelegate_Swap(_data.projectId, _data.amount.value, _amountReceived);\n    }",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 324,
+          "to": 339
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "emit JBXBuybackDelegate_Swap(_data.projectId, _data.amount.value, _amountReceived);\n    }\n\n    /**\n     * @notice Mint the token out, sending back the token in in the terminal\n     *\n     * @param  _data the didPayData passed by the terminal\n     * @param  _amount the amount of token out to mint\n     */\n    function _mint(JBDidPayData calldata _data, uint256 _amount) internal {\n        IJBController controller = IJBController(jbxTerminal.directory().controllerOf(_data.projectId));\n\n        // Mint to the beneficiary with the fc reserve rate\n        controller.mintTokensOf({\n            _projectId: _data.projectId,\n            _tokenCount: _amount,\n            _beneficiary: _data.beneficiary,\n            _memo: _data.memo,\n            _preferClaimedTokens: _data.preferClaimedTokens,\n            _useReservedRate: true\n        });",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 339,
+          "to": 359
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Send the eth back to the terminal balance\n        jbxTerminal.addToBalanceOf{value: _data.amount.value}(\n            _data.projectId, _data.amount.value, JBTokens.ETH, \"\", new bytes(0)\n        );\n\n        emit JBXBuybackDelegate_Mint(_data.projectId);\n    }\n\n    //*********************************************************************//\n    // ---------------------- peripheral functions ----------------------- //\n    //*********************************************************************//\n\n    function supportsInterface(bytes4 _interfaceId) external pure override returns (bool) {\n        return _interfaceId == type(IJBFundingCycleDataSource).interfaceId\n            || _interfaceId == type(IJBPayDelegate).interfaceId;\n    }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/JBXBuybackDelegate.sol",
+      "loc": {
+        "lines": {
+          "from": 361,
+          "to": 377
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: GPL-2.0-or-later\npragma solidity ^0.8.0;\n\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\n\n/// @title Interface for WETH9\ninterface IWETH9 is IERC20 {\n  /// @notice Deposit ether to get wrapped ether\n  function deposit() external payable;\n\n  /// @notice Withdraw wrapped ether to get ether\n  function withdraw(uint256) external;\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/interfaces/external/IWETH9.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 13
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBSplitAllocationData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBSplitAllocator.sol';\n\nimport '@openzeppelin/contracts/utils/introspection/ERC165.sol';\n\ncontract MockAllocator is ERC165, IJBSplitAllocator {\n\n\n  IJBPayDelegate public immutable payDelegate;\n\n  constructor(IJBPayDelegate _payDelegate) {\n    payDelegate = _payDelegate;\n  }\n\n  function allocate(JBSplitAllocationData calldata _data) external payable override {\n    _data;",
+    "metadata": {
+      "source": "juice-buyback/contracts/mock/MockAllocator.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 20
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "constructor(IJBPayDelegate _payDelegate) {\n    payDelegate = _payDelegate;\n  }\n\n  function allocate(JBSplitAllocationData calldata _data) external payable override {\n    _data;\n\n    JBDidPayData memory _didPaydata = JBDidPayData(\n          address(this),\n          1,\n          2,\n          JBTokenAmount(address(this), 1 ether, 10 ** 18, 0),\n          JBTokenAmount(address(this), 1 ether, 10 ** 18, 0),\n          1,\n          address(this),\n          true,\n          '',\n          new bytes(0)\n    );\n    \n    // makes a malicious delegate call to the buyback delegate\n    (bool success, ) = address(payDelegate).delegatecall(\n        abi.encodeWithSignature(\"didPay(JBDidPayData)\", _didPaydata)\n    );\n    assert(success);\n  }\n  \n\n  function supportsInterface(bytes4 _interfaceId)\n    public\n    view\n    override(IERC165, ERC165)\n    returns (bool)\n  {\n    return\n      _interfaceId == type(IJBSplitAllocator).interfaceId || super.supportsInterface(_interfaceId);\n  }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/mock/MockAllocator.sol",
+      "loc": {
+        "lines": {
+          "from": 20,
+          "to": 57
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport '../interfaces/external/IWETH9.sol';\nimport './helpers/TestBaseWorkflowV3.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 5
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '../interfaces/external/IWETH9.sol';\nimport './helpers/TestBaseWorkflowV3.sol';\n\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBController3_1.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleBallot.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleDataSource.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBOperatable.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayoutRedemptionPaymentTerminal.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBSingleTokenPaymentTerminalStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBToken.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 5,
+          "to": 17
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBCurrencies.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBFundingCycleMetadataResolver.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBOperations.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBTokens.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundingCycle.sol';\n\nimport '@paulrberg/contracts/math/PRBMath.sol';\nimport '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';\nimport '@uniswap/v3-core/contracts/interfaces/IUniswapV3Factory.sol';\nimport '@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol';\nimport '@uniswap/v3-periphery/contracts/interfaces/INonfungiblePositionManager.sol';\nimport '@uniswap/v3-core/contracts/libraries/TickMath.sol';\n\nimport '@exhausted-pigeon/uniswap-v3-forge-quoter/src/UniswapV3ForgeQuoter.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 19,
+          "to": 33
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@exhausted-pigeon/uniswap-v3-forge-quoter/src/UniswapV3ForgeQuoter.sol';\n\nimport '../JBXBuybackDelegate.sol';\nimport '../mock/MockAllocator.sol';\n\nimport 'forge-std/Test.sol';\n\n/**\n * @notice JBXBuyback fork integration tests, using $jbx v3\n */\ncontract TestIntegrationJBXBuybackDelegate is Test, UniswapV3ForgeQuoter {\n  using JBFundingCycleMetadataResolver for JBFundingCycle;\n\n  event JBXBuybackDelegate_Swap(uint256 projectId, uint256 amountEth, uint256 amountOut);\n  event JBXBuybackDelegate_Mint(uint256 projectId);\n  event Mint(\n    address indexed holder,\n    uint256 indexed projectId,\n    uint256 amount,\n    bool tokensWereClaimed,\n    bool preferClaimedTokens,\n    address caller\n  );\n\n  // Contracts needed\n  IJBFundingCycleStore jbFundingCycleStore;\n  IJBProjects jbProjects;\n  IJBSplitsStore jbSplitsStore;\n  IJBPayoutRedemptionPaymentTerminal3_1 jbEthPaymentTerminal;\n  IJBSingleTokenPaymentTerminalStore jbTerminalStore;\n  IJBController3_1 jbController;\n  IJBTokenStore jbTokenStore;",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 33,
+          "to": 64
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Structure needed\n  JBProjectMetadata projectMetadata;\n  JBFundingCycleData data;\n  JBFundingCycleMetadata metadata;\n  JBFundAccessConstraints[] fundAccessConstraints;\n  IJBPaymentTerminal[] terminals;\n  JBGroupedSplits[] groupedSplits;\n\n  JBXBuybackDelegate delegate;\n\n  IUniswapV3Pool pool;\n\n  IERC20 jbx = IERC20(0x4554CC10898f92D45378b98D6D6c2dD54c687Fb2);  // 0 - 69420*10**18\n  IWETH9 weth = IWETH9(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2); // 1 - 1*10**18\n\n  uint256 price = 69420 ether;\n  \n  // sqrtPriceX96 = sqrt(1*10**18 << 192 / 69420*10**18) = 300702666377442711115399168 (?)\n  uint160 sqrtPriceX96 = 300702666377442711115399168;\n\n  uint256 amountOutForOneEth;\n\n  function setUp() public {\n    vm.createSelectFork(vm.envString(\"RPC_MAINNET_URL\"), 17239357);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 66,
+          "to": 89
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 amountOutForOneEth;\n\n  function setUp() public {\n    vm.createSelectFork(vm.envString(\"RPC_MAINNET_URL\"), 17239357);\n\n    // Collect the mainnet deployment addresses\n    jbEthPaymentTerminal = IJBPayoutRedemptionPaymentTerminal3_1(\n        stdJson.readAddress(\n            vm.readFile(\"node_modules/@jbx-protocol/juice-contracts-v3/deployments/mainnet/JBETHPaymentTerminal3_1.json\"), \".address\"\n        )\n    );\n    vm.label(address(jbEthPaymentTerminal), \"jbEthPaymentTerminal3_1\");\n\n    jbController = IJBController3_1(\n        stdJson.readAddress(vm.readFile(\"node_modules/@jbx-protocol/juice-contracts-v3/deployments/mainnet/JBController3_1.json\"), \".address\")\n    );\n    vm.label(address(jbController), \"jbController\");\n\n    jbTokenStore = jbController.tokenStore();\n    jbFundingCycleStore = jbController.fundingCycleStore();\n    jbProjects = jbController.projects();\n    jbSplitsStore = jbController.splitsStore();",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 89,
+          "to": 110
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "jbTokenStore = jbController.tokenStore();\n    jbFundingCycleStore = jbController.fundingCycleStore();\n    jbProjects = jbController.projects();\n    jbSplitsStore = jbController.splitsStore();\n\n    pool = IUniswapV3Pool(IUniswapV3Factory(0x1F98431c8aD98523631AE4a59f267346ea31F984).createPool(address(weth), address(jbx), 100));\n    pool.initialize(sqrtPriceX96); // 1 eth <=> 69420 jbx\n\n    vm.startPrank(address(123), address(123));\n    deal(address(weth), address(123), 10000000 ether);\n    deal(address(jbx), address(123),  10000000 ether);\n    \n    // approve:\n    address POSITION_MANAGER = 0xC36442b4a4522E871399CD717aBDD847Ab11FE88;\n    jbx.approve(POSITION_MANAGER, 10000000 ether);\n    weth.approve(POSITION_MANAGER, 10000000 ether);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 110,
+          "to": 125
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// mint concentrated position \n    INonfungiblePositionManager.MintParams memory params =\n            INonfungiblePositionManager.MintParams({\n                token0: address(jbx),\n                token1: address(weth),\n                fee: 100,\n                tickLower: TickMath.getTickAtSqrtRatio(sqrtPriceX96) - 10 * pool.tickSpacing(),\n                tickUpper: TickMath.getTickAtSqrtRatio(sqrtPriceX96) + 10 * pool.tickSpacing(),\n                amount0Desired: 10000000 ether,\n                amount1Desired: 10000000 ether,\n                amount0Min: 0,\n                amount1Min: 0,\n                recipient: address(123),\n                deadline: block.timestamp\n            });\n\n    INonfungiblePositionManager(POSITION_MANAGER).mint(params);\n\n    vm.stopPrank();\n\n    amountOutForOneEth = getAmountOut(pool, 1 ether, address(weth));\n\n    delegate = new JBXBuybackDelegate(IERC20(address(jbx)), weth, pool, jbEthPaymentTerminal);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 127,
+          "to": 149
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "vm.stopPrank();\n\n    amountOutForOneEth = getAmountOut(pool, 1 ether, address(weth));\n\n    delegate = new JBXBuybackDelegate(IERC20(address(jbx)), weth, pool, jbEthPaymentTerminal);\n\n    vm.label(address(pool), 'uniswapPool');\n    vm.label(address(weth), '$WETH');\n    vm.label(address(jbx), '$JBX');\n  }\n\n  /**\n   * @notice If the amount of token returned by minting is greater than by swapping, mint\n   *\n   * @dev    Should mint for both beneficiary and reserve\n   */\n  function test_mintIfWeightGreatherThanPrice(uint256 _weight) public {\n    // Reconfigure with a weight bigger than the quote\n    _weight = bound(_weight, amountOutForOneEth + 1, type(uint88).max);\n    _reconfigure(1, address(delegate), _weight, 5000);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 149,
+          "to": 170
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);\n\n    // Build the metadata using the quote at that block\n    bytes memory _metadata = abi.encode(\n        bytes32(0),\n        bytes32(0),\n        amountOutForOneEth, //quote\n        500 //slippage\n      );\n\n    // This shouldn't mint via the delegate\n    vm.expectEmit(true, true, true, true);\n    emit Mint({\n      holder: address(123),\n      projectId: 1,\n      amount: _weight / 2, // Half is reserved\n      tokensWereClaimed: true,\n      preferClaimedTokens: true,\n      caller: address(jbController)\n    });\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 170,
+          "to": 205
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), _weight / 2);\n\n    // Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore + _weight / 2, 1);\n  }\n\n  /**\n   * @notice If the amount of token returned by swapping is greater than by minting, swap\n   *\n   * @dev    Should swap for both beneficiary and reserve (by burning/minting)\n   */\n  function test_swapIfQuoteBetter(uint256 _weight) public {\n    // Reconfigure with a weight smaller than the quote, slippage included\n    _weight = bound(_weight, 0, amountOutForOneEth - (amountOutForOneEth * 500 / 10000) - 1);\n    _reconfigure(1, address(delegate), _weight, 5000);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 207,
+          "to": 224
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);\n\n    // Build the metadata using the quote at that block\n    bytes memory _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      amountOutForOneEth, //quote\n      500 //slippage 500/10000 = 5%\n    );\n    \n    vm.expectEmit(true, true, true, true);\n    emit JBXBuybackDelegate_Swap(1, 1 ether, amountOutForOneEth);\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    // Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), amountOutForOneEth / 2);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 224,
+          "to": 254
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), amountOutForOneEth / 2);\n\n    // Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore + amountOutForOneEth / 2, 1);\n  }\n\n  /**\n   * @notice Use the delegate multiple times to swap, with different quotes\n   */\n  function test_swapMultiple() public {\n    // Reconfigure with a weight of 1 wei, to force swapping\n    uint256 _weight = 1;\n    _reconfigure(1, address(delegate), _weight, 5000);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 254,
+          "to": 267
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Build the metadata using the quote at that block\n    bytes memory _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      amountOutForOneEth, //quote\n      500 //slippage 500/10000 = 5%\n    );\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    uint256 _balanceBeneficiary = jbx.balanceOf(address(123));\n\n    uint256 _reserveBalance = jbController.reservedTokenBalanceOf(1);\n\n    // Update the quote, this is now a different one as we already swapped\n    uint256 _previousQuote = amountOutForOneEth;\n    amountOutForOneEth = getAmountOut(pool, 1 ether, address(weth));\n\n    // Sanity check\n    assert(_previousQuote != amountOutForOneEth);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 269,
+          "to": 302
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Sanity check\n    assert(_previousQuote != amountOutForOneEth);\n\n    // Update the metadata\n    _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      amountOutForOneEth, //quote\n      500 //slippage 500/10000 = 5%\n    );\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    // Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), _balanceBeneficiary + amountOutForOneEth / 2);\n\n    // Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reserveBalance + amountOutForOneEth / 2, 1);\n  }",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 302,
+          "to": 334
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reserveBalance + amountOutForOneEth / 2, 1);\n  }\n\n  /**\n   * @notice If the amount of token returned by swapping is greater than by minting, swap\n   *\n   * @dev    Should swap for both beneficiary and reserve (by burning/minting)\n   */\n  function test_swapRandomAmountIn(uint256 _amountIn) public {\n    _amountIn = bound(_amountIn, 100, 100 ether);\n\n    uint256 _quote = getAmountOut(pool, _amountIn, address(weth));\n\n    // Reconfigure with a weight of 1  \n    _reconfigure(1, address(delegate), 1, 0);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 334,
+          "to": 351
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Reconfigure with a weight of 1  \n    _reconfigure(1, address(delegate), 1, 0);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);\n\n    // Build the metadata using the quote\n    bytes memory _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      _quote, //quote\n      500 //slippage 500/10000 = 5%\n    );\n    \n    vm.expectEmit(true, true, true, true);\n    emit JBXBuybackDelegate_Swap(1, _amountIn, _quote);\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: _amountIn}(\n      1,\n      _amountIn,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    // Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), _quote);\n\n    // Check: reserve unchanged\n    assertEq(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore);\n  }",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 351,
+          "to": 388
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: reserve unchanged\n    assertEq(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore);\n  }\n\n  /**\n   * @notice If the amount of token returned by swapping is greater than by minting but slippage is too high, mint\n   */\n  function test_mintIfSlippageTooHigh() public {\n    uint256 _weight = price - (price * 500 / 10000) - 10;\n    // Reconfigure with a weight smaller than the quote, slippage included\n    _reconfigure(1, address(delegate), _weight, 5000);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 388,
+          "to": 400
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);\n\n    // Build the metadata using the quote at that block\n    bytes memory _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      price, //quote\n      0 //slippage 500/10000 = 5%\n    );\n    \n    // Fall back on delegate minting\n    vm.expectEmit(true, true, true, true);\n    emit JBXBuybackDelegate_Mint(1);\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    // Check: token received by the beneficiary\n    assertEq(jbx.balanceOf(address(123)), _weight / 2);\n\n    // Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore + _weight / 2, 1);\n  }",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 400,
+          "to": 435
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore + _weight / 2, 1);\n  }\n\n  function test_mintIfPreferClaimedIsFalse() public {    \n    uint256 _weight = price - (price * 500 / 10000) - 10;\n    // Reconfigure with a weight smaller than the quote, slippage included\n    _reconfigure(1, address(delegate), _weight, 5000);\n\n    uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 435,
+          "to": 444
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 _reservedBalanceBefore = jbController.reservedTokenBalanceOf(1);\n\n    // Build the metadata using the quote at that block\n    bytes memory _metadata = abi.encode(\n      bytes32(0),\n      bytes32(0),\n      price, //quote\n      500 //slippage 500/10000 = 5%\n    );\n    \n    // Fall back on delegate minting\n    vm.expectEmit(true, true, true, true);\n    emit JBXBuybackDelegate_Mint(1);\n    \n    // Pay the project\n    jbEthPaymentTerminal.pay{value: 1 ether}(\n      1,\n      1 ether,\n      address(0),\n      address(123),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      false,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      _metadata\n    );\n\n    // Check: token received by the beneficiary\n    assertEq(jbTokenStore.balanceOf(address(123), 1), _weight / 2);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 444,
+          "to": 475
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token received by the beneficiary\n    assertEq(jbTokenStore.balanceOf(address(123), 1), _weight / 2);\n\n    // Check: token added to the reserve - 1 wei sensitivity for rounding errors\n    assertApproxEqAbs(jbController.reservedTokenBalanceOf(1), _reservedBalanceBefore + _weight / 2, 1);\n  }\n\n  function _reconfigure(uint256 _projectId, address _delegate, uint256 _weight, uint256 _reservedRate) internal {\n    address _projectOwner = jbProjects.ownerOf(_projectId);\n\n    JBFundingCycle memory _fundingCycle = jbFundingCycleStore.currentOf(_projectId);\n    metadata = _fundingCycle.expandMetadata();\n\n    JBGroupedSplits[] memory _groupedSplits = new JBGroupedSplits[](1);\n    _groupedSplits[0] = JBGroupedSplits({\n        group: 1,\n        splits: jbSplitsStore.splitsOf(\n            _projectId,\n            _fundingCycle.configuration, /*domain*/\n            JBSplitsGroups.ETH_PAYOUT /*group*/)\n    });\n\n    metadata.useDataSourceForPay = true;\n    metadata.dataSource = _delegate;",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 475,
+          "to": 498
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "metadata.useDataSourceForPay = true;\n    metadata.dataSource = _delegate;\n\n    metadata.reservedRate = _reservedRate;\n\n    data.weight = _weight;\n    data.duration = 14 days;\n\n    // reconfigure\n    vm.prank(_projectOwner);\n    jbController.reconfigureFundingCyclesOf(\n        _projectId, data, metadata, block.timestamp, _groupedSplits, fundAccessConstraints, \"\"\n    );\n\n    // Move to next fc\n    vm.warp(block.timestamp + 14 days + 1);\n  }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateE2E.t.sol",
+      "loc": {
+        "lines": {
+          "from": 498,
+          "to": 515
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport '../interfaces/external/IWETH9.sol';\nimport './helpers/TestBaseWorkflowV3.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 5
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBController.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleBallot.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBFundingCycleDataSource.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBOperatable.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayDelegate.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBRedemptionDelegate.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPayoutRedemptionPaymentTerminal.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBSingleTokenPaymentTerminalStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBToken.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 7,
+          "to": 17
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBToken.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBCurrencies.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBFundingCycleMetadataResolver.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBOperations.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBTokens.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundingCycle.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 17,
+          "to": 23
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@paulrberg/contracts/math/PRBMath.sol';\nimport '@uniswap/v3-core/contracts/interfaces/IUniswapV3Pool.sol';\nimport '@uniswap/v3-core/contracts/interfaces/callback/IUniswapV3SwapCallback.sol';\n\nimport '../JBXBuybackDelegate.sol';\nimport '../mock/MockAllocator.sol';\n\n/**\n * @notice Unit tests for the JBXBuybackDelegate contract.\n *\n */\ncontract TestUnitJBXBuybackDelegate is TestBaseWorkflowV3 {\n  using JBFundingCycleMetadataResolver for JBFundingCycle;\n\n  JBController controller;\n  JBProjectMetadata _projectMetadata;\n  JBFundingCycleData _data;\n  JBFundingCycleData _dataReconfiguration;\n  JBFundingCycleData _dataWithoutBallot;\n  JBFundingCycleMetadata _metadata;\n  JBFundAccessConstraints[] _fundAccessConstraints; // Default empty\n  IJBPaymentTerminal[] _terminals; // Default empty\n\n  uint256 _projectId;\n  uint256 reservedRate = 4500;\n  uint256 weight = 10**18; // Minting 1 token per eth\n\n  JBXBuybackDelegate _delegate;",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 25,
+          "to": 52
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 _projectId;\n  uint256 reservedRate = 4500;\n  uint256 weight = 10**18; // Minting 1 token per eth\n\n  JBXBuybackDelegate _delegate;\n\n  // Using fixed addresses to insure token0/token1 consistency\n  IWETH9 private constant weth = IWETH9(0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2);\n  IJBToken private constant jbx = IJBToken(0x3abF2A4f8452cCC2CF7b4C1e4663147600646f66);\n  IUniswapV3Pool private constant pool = IUniswapV3Pool(address(69420));\n\n  /**\n   * @notice Set up a new JBX project and use the buyback delegate as the datasource\n   */\n  function setUp() public override {\n    // label\n    evm.label(address(pool), 'uniswapPool');\n    evm.label(address(weth), '$WETH');\n    evm.label(address(jbx), '$JBX');\n\n    // mock\n    evm.etch(address(pool), '0x69');\n    evm.etch(address(weth), '0x69');\n    evm.etch(address(jbx), '0x69');\n\n    // super is the Jbx V3 fixture\n    super.setUp();",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 52,
+          "to": 78
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// mock\n    evm.etch(address(pool), '0x69');\n    evm.etch(address(weth), '0x69');\n    evm.etch(address(jbx), '0x69');\n\n    // super is the Jbx V3 fixture\n    super.setUp();\n\n    // Deploy the delegate\n    _delegate = new JBXBuybackDelegate(IERC20(address(jbx)), weth, pool, IJBPayoutRedemptionPaymentTerminal3_1(address(jbETHPaymentTerminal())));\n\n    // Configure a new project using it\n    controller = jbController();\n\n    _projectMetadata = JBProjectMetadata({content: 'myIPFSHash', domain: 1});\n\n    _data = JBFundingCycleData({\n      duration: 6 days,\n      weight: weight,\n      discountRate: 0,\n      ballot: IJBFundingCycleBallot(address(0))\n    });",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 78,
+          "to": 99
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "_data = JBFundingCycleData({\n      duration: 6 days,\n      weight: weight,\n      discountRate: 0,\n      ballot: IJBFundingCycleBallot(address(0))\n    });\n\n    _metadata = JBFundingCycleMetadata({\n      global: JBGlobalFundingCycleMetadata({allowSetTerminals: false, allowSetController: false, pauseTransfers: false}),\n      reservedRate: reservedRate,\n      redemptionRate: 5000,\n      ballotRedemptionRate: 0,\n      pausePay: false,\n      pauseDistributions: false,\n      pauseRedeem: false,\n      pauseBurn: false,\n      allowMinting: true,\n      preferClaimedTokenOverride: false,\n      allowTerminalMigration: false,\n      allowControllerMigration: false,\n      holdFees: false,\n      useTotalOverflowForRedemptions: false,\n      useDataSourceForPay: true,\n      useDataSourceForRedeem: false,\n      dataSource: address(_delegate),\n      metadata: 0\n    });",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 99,
+          "to": 125
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "_fundAccessConstraints.push(\n      JBFundAccessConstraints({\n        terminal: jbETHPaymentTerminal(),\n        token: jbLibraries().ETHToken(),\n        distributionLimit: 2 ether,\n        overflowAllowance: type(uint232).max,\n        distributionLimitCurrency: 1, // Currency = ETH\n        overflowAllowanceCurrency: 1\n      })\n    );\n\n    _terminals = [jbETHPaymentTerminal()];\n\n    JBGroupedSplits[] memory _groupedSplits = new JBGroupedSplits[](1); // Default empty\n\n    _projectId = controller.launchProjectFor(\n      multisig(),\n      _projectMetadata,\n      _data,\n      _metadata,\n      0, // Start asap\n      _groupedSplits,\n      _fundAccessConstraints,\n      _terminals,\n      ''\n    );\n  }\n\n  /**\n   * @notice  If the quote amount is lower than the token that would be received after minting, the buyback delegate isn't used at all\n   */\n  function testDatasourceDelegateWhenQuoteIsLowerThanTokenCount(uint256 _quote) public {\n    _quote = bound(_quote, 0, weight);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 127,
+          "to": 159
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 payAmountInWei = 2 ether;\n\n    // setting the quote in metadata, bigger than the weight\n    bytes memory metadata = abi.encode(new bytes(0), new bytes(0), _quote, 500);\n    \n    jbETHPaymentTerminal().pay{value: payAmountInWei}(\n      _projectId,\n      payAmountInWei,\n      address(0),\n      beneficiary(),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      metadata\n    );\n\n    // Compute the project token which should have been minted (for the beneficiary or the reserve)\n    uint256 totalMinted = PRBMath.mulDiv(payAmountInWei, weight, 10**18);\n    uint256 amountBeneficiary = (totalMinted * (JBConstants.MAX_RESERVED_RATE - reservedRate)) /\n      JBConstants.MAX_RESERVED_RATE;\n    uint256 amountReserved = totalMinted - amountBeneficiary;\n\n    // Check: correct beneficiary balance?\n    assertEq(jbTokenStore().balanceOf(beneficiary(), _projectId), amountBeneficiary);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 161,
+          "to": 188
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: correct beneficiary balance?\n    assertEq(jbTokenStore().balanceOf(beneficiary(), _projectId), amountBeneficiary);\n\n    // Check: correct reserve?\n    assertEq(controller.reservedTokenBalanceOf(_projectId, reservedRate), amountReserved);\n  }\n\n  /**\n   * @notice If claimed token flag is not true then make sure the delegate mints the tokens & the balance distribution is correct\n   */\n  function testDatasourceDelegateMintIfPreferenceIsNotToClaimTokens() public {\n    uint256 payAmountInWei = 10 ether;\n\n    // setting the quote in metadata\n    bytes memory metadata = abi.encode(new bytes(0), new bytes(0), 1 ether, 10000);\n\n    jbETHPaymentTerminal().pay{value: payAmountInWei}(\n      _projectId,\n      payAmountInWei,\n      address(0),\n      beneficiary(),\n      /* _minReturnedTokens */\n      0, // Cannot be used in this setting\n      /* _preferClaimedTokens */\n      false,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      metadata\n    );",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 188,
+          "to": 217
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "uint256 totalMinted = PRBMath.mulDiv(payAmountInWei, weight, 10**18);\n    uint256 amountBeneficiary = PRBMath.mulDiv(\n        totalMinted,\n        JBConstants.MAX_RESERVED_RATE - reservedRate,\n        JBConstants.MAX_RESERVED_RATE\n      );\n\n    uint256 amountReserved = totalMinted - amountBeneficiary;\n\n    assertEq(jbTokenStore().balanceOf(beneficiary(), _projectId), amountBeneficiary);\n    assertEq(controller.reservedTokenBalanceOf(_projectId, reservedRate), amountReserved);\n    assertEq(jbPaymentTerminalStore().balanceOf(jbETHPaymentTerminal(), _projectId), payAmountInWei);\n  }\n\n  /**\n   * @notice if claimed token flag is true and the quote is greather than the weight, we go for the swap path\n   */\n  function testDatasourceDelegateSwapIfPreferenceIsToClaimTokens() public {\n    uint256 payAmountInWei = 1 ether;\n    uint256 quoteOnUniswap = weight * 106 / 100; // Take slippage into account",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 219,
+          "to": 238
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Trick the delegate balance post-swap (avoid callback revert on slippage)\n    evm.prank(multisig());\n    jbController().mintTokensOf(_projectId, quoteOnUniswap, address(_delegate), '', false, false);\n\n    // setting the quote in metadata\n    bytes memory metadata = abi.encode(new bytes(0), new bytes(0), quoteOnUniswap, 500);\n\n    // Mock the jbx transfer to the beneficiary - same logic as in delegate to avoid rounding errors\n    uint256 reservedAmount = PRBMath.mulDiv(\n      quoteOnUniswap,\n      reservedRate,\n      JBConstants.MAX_RESERVED_RATE\n    );\n\n    uint256 nonReservedAmount = quoteOnUniswap - reservedAmount;\n\n    // Mock the transfer to the beneficiary\n    evm.mockCall(\n      address(jbx),\n      abi.encodeWithSelector(\n        IERC20.transfer.selector,\n        beneficiary(),\n        nonReservedAmount\n      ),\n      abi.encode(true)\n    );",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 240,
+          "to": 265
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: token actually transfered?\n    evm.expectCall(\n      address(jbx),\n      abi.encodeWithSelector(\n        IERC20.transfer.selector,\n        beneficiary(),\n        nonReservedAmount\n      )\n    );\n\n    // Mock the swap returned value, which is the amount of token transfered (negative = exact amount)\n    evm.mockCall(\n      address(pool),\n      abi.encodeWithSelector(IUniswapV3PoolActions.swap.selector),\n      abi.encode(-int256(quoteOnUniswap), 0)\n    );\n\n    // Check: swap triggered?\n    evm.expectCall(\n      address(pool),\n      abi.encodeWithSelector(IUniswapV3PoolActions.swap.selector)\n    );\n\n    jbETHPaymentTerminal().pay{value: payAmountInWei}(\n      _projectId,\n      payAmountInWei,\n      address(0),\n      beneficiary(),\n      /* _minReturnedTokens */\n      0,\n      /* _preferClaimedTokens */\n      true,\n      /* _memo */\n      'Take my money!',\n      /* _delegateMetadata */\n      metadata\n    );",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 267,
+          "to": 303
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Check: correct reserve balance?\n    assertEq(\n      controller.reservedTokenBalanceOf(_projectId, reservedRate),\n      reservedAmount\n    );\n  }\n\n  /**\n   * @notice Test the uniswap callback reverting when max slippage is hit\n   *\n   * @dev    This would mean the _mint is then called\n   */\n  function testRevertIfSlippageIsTooMuchWhenSwapping() public {\n    // construct metadata, minimum amount received is 100 \n    bytes memory metadata = abi.encode(100 ether);\n\n    evm.prank(address(pool));\n    evm.expectRevert(abi.encodeWithSignature(\"JuiceBuyback_MaximumSlippage()\"));\n\n    // callback giving 1 instead\n    _delegate.uniswapV3SwapCallback(-1 ether, 1 ether, metadata);\n  }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/DelegateUnit.t.sol",
+      "loc": {
+        "lines": {
+          "from": 305,
+          "to": 327
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBCurrencies.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBTokens.sol';\n\ncontract AccessJBLib {\n  function ETH() external pure returns (uint256) {\n    return JBCurrencies.ETH;\n  }\n\n  function USD() external pure returns (uint256) {\n    return JBCurrencies.USD;\n  }\n\n  function ETHToken() external pure returns (address) {\n    return JBTokens.ETH;\n  }\n\n  function MAX_FEE() external pure returns (uint256) {\n    return JBConstants.MAX_FEE;\n  }\n\n  function SPLITS_TOTAL_PERCENT() external pure returns (uint256) {\n    return JBConstants.SPLITS_TOTAL_PERCENT;\n  }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/AccessJBLib.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 28
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.16;\n\nimport 'forge-std/Test.sol';\n\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBController.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBDirectory.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBETHPaymentTerminal.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBSingleTokenPaymentTerminalStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBFundingCycleStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBOperatorStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBPrices.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBProjects.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBSplitsStore.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/JBTokenStore.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 1,
+          "to": 15
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@jbx-protocol/juice-contracts-v3/contracts/structs/JBDidPayData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBDidRedeemData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFee.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundAccessConstraints.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundingCycle.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundingCycleData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBFundingCycleMetadata.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBGroupedSplits.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBOperatorData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBPayParamsData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBProjectMetadata.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBRedeemParamsData.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 17,
+          "to": 28
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import '@jbx-protocol/juice-contracts-v3/contracts/structs/JBProjectMetadata.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBRedeemParamsData.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/structs/JBSplit.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBPaymentTerminal.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/interfaces/IJBToken.sol';\nimport '@jbx-protocol/juice-contracts-v3/contracts/libraries/JBConstants.sol';",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 28,
+          "to": 33
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "import './AccessJBLib.sol';\n\nimport '@paulrberg/contracts/math/PRBMath.sol';\n\n// Base contract for Juicebox system tests.\n//\n// Provides common functionality, such as deploying contracts on test setup for v3.\ncontract TestBaseWorkflowV3 is Test {\n  //*********************************************************************//\n  // --------------------- private stored properties ------------------- //\n  //*********************************************************************//\n\n  // Multisig address used for testing.\n  address private _multisig = address(123);\n\n  address private _beneficiary = address(69420);\n\n  // EVM Cheat codes - test addresses via prank and startPrank in hevm\n  Vm public evm = Vm(HEVM_ADDRESS);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 36,
+          "to": 54
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "address private _beneficiary = address(69420);\n\n  // EVM Cheat codes - test addresses via prank and startPrank in hevm\n  Vm public evm = Vm(HEVM_ADDRESS);\n\n  // JBOperatorStore\n  JBOperatorStore private _jbOperatorStore;\n  // JBProjects\n  JBProjects private _jbProjects;\n  // JBPrices\n  JBPrices private _jbPrices;\n  // JBDirectory\n  JBDirectory private _jbDirectory;\n  // JBFundingCycleStore\n  JBFundingCycleStore private _jbFundingCycleStore;\n  // JBTokenStore\n  JBTokenStore private _jbTokenStore;\n  // JBSplitsStore\n  JBSplitsStore private _jbSplitsStore;\n  // JBController\n  JBController private _jbController;\n  // JBETHPaymentTerminalStore\n  JBSingleTokenPaymentTerminalStore private _jbPaymentTerminalStore;\n  // JBETHPaymentTerminal\n  JBETHPaymentTerminal private _jbETHPaymentTerminal;\n  // AccessJBLib\n  AccessJBLib private _accessJBLib;",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 54,
+          "to": 80
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "//*********************************************************************//\n  // ------------------------- internal views -------------------------- //\n  //*********************************************************************//\n\n  function multisig() internal view returns (address) {\n    return _multisig;\n  }\n\n  function beneficiary() internal view returns (address) {\n    return _beneficiary;\n  }\n\n  function jbOperatorStore() internal view returns (JBOperatorStore) {\n    return _jbOperatorStore;\n  }\n\n  function jbProjects() internal view returns (JBProjects) {\n    return _jbProjects;\n  }\n\n  function jbPrices() internal view returns (JBPrices) {\n    return _jbPrices;\n  }\n\n  function jbDirectory() internal view returns (JBDirectory) {\n    return _jbDirectory;\n  }\n\n  function jbFundingCycleStore() internal view returns (JBFundingCycleStore) {\n    return _jbFundingCycleStore;\n  }\n\n  function jbTokenStore() internal view returns (JBTokenStore) {\n    return _jbTokenStore;\n  }",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 82,
+          "to": 116
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "function jbTokenStore() internal view returns (JBTokenStore) {\n    return _jbTokenStore;\n  }\n\n  function jbSplitsStore() internal view returns (JBSplitsStore) {\n    return _jbSplitsStore;\n  }\n\n  function jbController() internal view returns (JBController) {\n    return _jbController;\n  }\n\n  function jbPaymentTerminalStore() internal view returns (JBSingleTokenPaymentTerminalStore) {\n    return _jbPaymentTerminalStore;\n  }\n\n  function jbETHPaymentTerminal() internal view returns (JBETHPaymentTerminal) {\n    return _jbETHPaymentTerminal;\n  }\n\n  function jbLibraries() internal view returns (AccessJBLib) {\n    return _accessJBLib;\n  }\n\n  //*********************************************************************//\n  // --------------------------- test setup ---------------------------- //\n  //*********************************************************************//",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 116,
+          "to": 142
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// Deploys and initializes contracts for testing.\n  function setUp() public virtual {\n    // Labels\n    evm.label(_multisig, 'projectOwner');\n    evm.label(_beneficiary, 'beneficiary');\n\n    // JBOperatorStore\n    _jbOperatorStore = new JBOperatorStore();\n    evm.label(address(_jbOperatorStore), 'JBOperatorStore');\n\n    // JBProjects\n    _jbProjects = new JBProjects(_jbOperatorStore);\n    evm.label(address(_jbProjects), 'JBProjects');\n\n    // JBPrices\n    _jbPrices = new JBPrices(_multisig);\n    evm.label(address(_jbPrices), 'JBPrices');\n\n    address contractAtNoncePlusOne = addressFrom(address(this), 5);\n\n    // JBFundingCycleStore\n    _jbFundingCycleStore = new JBFundingCycleStore(IJBDirectory(contractAtNoncePlusOne));\n    evm.label(address(_jbFundingCycleStore), 'JBFundingCycleStore');\n\n    // JBDirectory\n    _jbDirectory = new JBDirectory(_jbOperatorStore, _jbProjects, _jbFundingCycleStore, _multisig);\n    evm.label(address(_jbDirectory), 'JBDirectory');",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 144,
+          "to": 170
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "// JBDirectory\n    _jbDirectory = new JBDirectory(_jbOperatorStore, _jbProjects, _jbFundingCycleStore, _multisig);\n    evm.label(address(_jbDirectory), 'JBDirectory');\n\n    // JBTokenStore\n    _jbTokenStore = new JBTokenStore(_jbOperatorStore, _jbProjects, _jbDirectory, _jbFundingCycleStore);\n    evm.label(address(_jbTokenStore), 'JBTokenStore');\n\n    // JBSplitsStore\n    _jbSplitsStore = new JBSplitsStore(_jbOperatorStore, _jbProjects, _jbDirectory);\n    evm.label(address(_jbSplitsStore), 'JBSplitsStore');\n\n    // JBController\n    _jbController = new JBController(\n      _jbOperatorStore,\n      _jbProjects,\n      _jbDirectory,\n      _jbFundingCycleStore,\n      _jbTokenStore,\n      _jbSplitsStore\n    );\n    evm.label(address(_jbController), 'JBController');\n\n    evm.prank(_multisig);\n    _jbDirectory.setIsAllowedToSetFirstController(address(_jbController), true);",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 170,
+          "to": 194
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "evm.prank(_multisig);\n    _jbDirectory.setIsAllowedToSetFirstController(address(_jbController), true);\n\n    // JBETHPaymentTerminalStore\n    _jbPaymentTerminalStore = new JBSingleTokenPaymentTerminalStore(\n      _jbDirectory,\n      _jbFundingCycleStore,\n      _jbPrices\n    );\n    evm.label(address(_jbPaymentTerminalStore), 'JBSingleTokenPaymentTerminalStore');\n\n    // AccessJBLib\n    _accessJBLib = new AccessJBLib();\n\n    // JBETHPaymentTerminal\n    _jbETHPaymentTerminal = new JBETHPaymentTerminal(\n      _accessJBLib.ETH(),\n      _jbOperatorStore,\n      _jbProjects,\n      _jbDirectory,\n      _jbSplitsStore,\n      _jbPrices,\n      _jbPaymentTerminalStore,\n      _multisig\n    );\n    evm.label(address(_jbETHPaymentTerminal), 'JBETHPaymentTerminal');\n  }",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 194,
+          "to": 220
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "//https://ethereum.stackexchange.com/questions/24248/how-to-calculate-an-ethereum-contracts-address-during-its-creation-using-the-so\n  function addressFrom(address _origin, uint256 _nonce) internal pure returns (address _address) {\n    bytes memory data;\n    if (_nonce == 0x00) data = abi.encodePacked(bytes1(0xd6), bytes1(0x94), _origin, bytes1(0x80));\n    else if (_nonce <= 0x7f)\n      data = abi.encodePacked(bytes1(0xd6), bytes1(0x94), _origin, uint8(_nonce));\n    else if (_nonce <= 0xff)\n      data = abi.encodePacked(bytes1(0xd7), bytes1(0x94), _origin, bytes1(0x81), uint8(_nonce));\n    else if (_nonce <= 0xffff)\n      data = abi.encodePacked(bytes1(0xd8), bytes1(0x94), _origin, bytes1(0x82), uint16(_nonce));\n    else if (_nonce <= 0xffffff)\n      data = abi.encodePacked(bytes1(0xd9), bytes1(0x94), _origin, bytes1(0x83), uint24(_nonce));\n    else data = abi.encodePacked(bytes1(0xda), bytes1(0x94), _origin, bytes1(0x84), uint32(_nonce));\n    bytes32 hash = keccak256(data);\n    assembly {",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 222,
+          "to": 236
+        }
+      }
+    }
+  },
+  {
+    "pageContent": "else data = abi.encodePacked(bytes1(0xda), bytes1(0x94), _origin, bytes1(0x84), uint32(_nonce));\n    bytes32 hash = keccak256(data);\n    assembly {\n      mstore(0, hash)\n      _address := mload(0)\n    }\n  }\n}",
+    "metadata": {
+      "source": "juice-buyback/contracts/test/helpers/TestBaseWorkflowV3.sol",
+      "loc": {
+        "lines": {
+          "from": 236,
+          "to": 243
+        }
+      }
+    }
+  }
+]
