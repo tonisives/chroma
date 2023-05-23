@@ -1,5 +1,5 @@
 import { config } from "./config.js";
-import { loadDocs } from "./loadDocs.js";
+import { loadDocs } from "./docs/loadDocs.js";
 
 let { client, collection_name, ef } = config
 

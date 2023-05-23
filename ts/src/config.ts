@@ -1,6 +1,7 @@
 import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
+import cohere from "cohere-ai"
 
 let client = new ChromaClient("http://18.246.10.12:8000")
 

@@ -272,9 +272,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"langchain@npm:^0.0.78":
+"langchain@https://github.com/tonisives/langchainjs#head=ah&workspace=langchain":
   version: 0.0.78
-  resolution: "langchain@npm:0.0.78"
+  resolution: "langchain@https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=ad8a260c25ca07b2fa3beedf4cb90495cbf9f7ff"
   dependencies:
     "@anthropic-ai/sdk": ^0.4.3
     ansi-styles: ^5.0.0
@@ -402,7 +402,7 @@ __metadata:
       optional: true
     weaviate-ts-client:
       optional: true
-  checksum: 90897ab521284f508932e1d5b9f68757b9068ee7f61a323e927418e25694a3183b7225898e7039dd7f0bc5fcd1841b6360a60ad0dda8677ce8872c0ec76be5f6
+  checksum: 4c695fddeda9d11792155d6cb80550280afa6848895c44284eb2e31aec1b2957cb2557036c57a1addfe789f29f3fa0b37c7f078be61fd973e55a6c2d2aa87d53
   languageName: node
   linkType: hard
 
@@ -624,7 +624,7 @@ __metadata:
     "@types/node": ^20.2.1
     chromadb: 1.4.1
     cohere-ai: ^6.2.1
-    langchain: ^0.0.78
+    langchain: "https://github.com/tonisives/langchainjs#head=ah&workspace=langchain"
     markdown-it: ^13.0.1
     markdown-it-terminal: ^0.4.0
     openai: ^3.2.1

@@ -7,7 +7,7 @@ console.log(`querying collection ${collection_name}`);
 
 let collection = await client.getOrCreateCollection(collection_name, undefined, ef)
 
-let result = (await collection.query(undefined, 10, undefined, "Where are the tokens swapped?"))
+let result = (await collection.query(undefined, 10, undefined, "Information about the project"))
 
 if (result.error) {
   console.log(`error: ${result.message}`)
