@@ -3,6 +3,9 @@
   "name": "ts",
   "packageManager": "yarn@3.5.0",
   "dependencies": {
+    "@aws-sdk/client-dynamodb": "^3.338.0",
+    "@aws-sdk/lib-dynamodb": "^3.338.0",
+    "@aws-sdk/util-dynamodb": "^3.338.0",
     "chromadb": "1.4.1",
     "cohere-ai": "^6.2.1",
     "langchain": "https://github.com/tonisives/langchainjs#head=ah&workspace=langchain",

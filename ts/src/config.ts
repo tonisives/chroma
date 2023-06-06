@@ -15,13 +15,16 @@ export type Config = {
   ef: OpenAIEmbeddingFunction | CohereEmbeddingFunction
 }
 
+export let contestName = "2023-05-chainlink"
+
 const openAiConfig = (): Config => {
   console.log("using openai")
 
-  let model_name = "text-embedding-ada-002"
+  // let model_name = "text-embedding-ada-002"
+  let model_name = "cohere-large"
   let model_hash = calcHash(model_name)
 
-  let collection_name = `ah-00000000-${model_hash}-2023-05-juicebox`
+  let collection_name = `ah-00000000-${model_hash}-${contestName}`
 
   let ef = new OpenAIEmbeddingFunction(
     process.env.OPENAI_TOKEN ?? "",
@@ -40,7 +43,7 @@ const cohereConfig = () => {
   let model_name = "cohere-large"
   let model_hash = calcHash(model_name)
 
-  let collection_name = `ah-00000000-${model_hash}-2023-05-juicebox`
+  let collection_name = `ah-00000000-${model_hash}-${contestName}`
 
   let ef = new CohereEmbeddingFunction(
     process.env.COHERE_TOKEN ?? ""
