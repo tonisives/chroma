@@ -3,11 +3,13 @@ import { logMarkdown } from "./terminal.js";
 
 let { client, collection_name, ef } = config
 
-console.log(`querying collection ${collection_name}`);
+let query = "Where are the tokens transferred in code?"
+
+console.log(`querying collection ${collection_name} for\n${query}`);
 
 let collection = await client.getOrCreateCollection(collection_name, undefined, ef)
 
-let result = (await collection.query(undefined, 10, undefined, "Information about the project"))
+let result = (await collection.query(undefined, 10, undefined, query))
 
 if (result.error) {
   console.log(`error: ${result.message}`)

@@ -44,5 +44,15 @@
         "./src/query.ts"
       ]
     },
+    {
+      "name": "get count",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/getCount.ts"
+      ]
+    },
   ]
 }
