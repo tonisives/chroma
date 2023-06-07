@@ -54,5 +54,15 @@
         "./src/getCount.ts"
       ]
     },
+    {
+      "name": "list collections",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/listCollections.ts"
+      ]
+    },
   ]
 }

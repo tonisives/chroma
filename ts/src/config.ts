@@ -15,7 +15,7 @@ export type Config = {
   ef: OpenAIEmbeddingFunction | CohereEmbeddingFunction
 }
 
-export let contestName = "2023-05-chainlink"
+export let contestName = "ah-00000000-3a7b-2023-05-base"
 
 const openAiConfig = (): Config => {
   console.log("using openai")
