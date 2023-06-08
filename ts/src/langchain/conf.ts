@@ -5,6 +5,7 @@ import { CHROMA_URL } from "../config.js"
 
 process.env.CHROMA_DB_URL = CHROMA_URL
 
+
 export type EmbeddingsConf = {
   embeddings: (index?: number) => Embeddings
   model: string // sha256 4 byte index of the model
@@ -31,10 +32,15 @@ let cohereToken = (index?: number) => {
 }
 
 let cohereEmbeddings = {
-  embeddings: (index?: number) => new CohereEmbeddings({
-    apiKey: cohereToken(index),
-    modelName: "large"
-  }),
+  embeddings: (index?: number) => {
+    let key = cohereToken(index)
+    console.log(`using cohere ${key?.slice(0, 4)}`);
+
+    return new CohereEmbeddings({
+      apiKey: key,
+      modelName: "large"
+    })
+  },
   model: "3a7b",
   putLimit: 220
 }

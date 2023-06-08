@@ -1,4 +1,4 @@
-import { DynamoDBDocumentClient, QueryCommandInput, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 import { config, contestName } from "./config.js";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
@@ -6,7 +6,7 @@ let { client, collection_name, ef } = config
 
 console.log(`deleting collection ${collection_name}`);
 
-await client.deleteCollection(collection_name)
+await client.deleteCollection({ name: collection_name })
 
 
 // also delete em_stored from aws

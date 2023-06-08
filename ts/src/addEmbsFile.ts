@@ -4,7 +4,11 @@ import { loadDocs } from "./docs/loadDocs.js";
 let { client, collection_name, ef } = config
 
 console.log("start");
-let collection = await client.getOrCreateCollection(collection_name, undefined, ef)
+let collection = await client.getOrCreateCollection({
+  name: collection_name,
+  embeddingFunction: ef
+})
+
 console.log(`adding embs to ${collection.name}`);
 let docs = await loadDocs("./src/sample/juicebox/")
 

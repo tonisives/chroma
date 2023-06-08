@@ -65,7 +65,7 @@
       ]
     },
     {
-      "name": "lj: addEmbsJson",
+      "name": "lc: addEmbsJson",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",
@@ -75,7 +75,7 @@
       ]
     },
     {
-      "name": "lj: getCount",
+      "name": "lc: getCount",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",

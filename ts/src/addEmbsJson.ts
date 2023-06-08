@@ -5,15 +5,24 @@ let { client, collection_name, ef } = config
 
 console.log("start");
 
-let collection = await client.getOrCreateCollection(collection_name, undefined, ef)
+let collection = await client.getOrCreateCollection({
+  name: collection_name,
+  embeddingFunction: ef
+})
 
 console.log(`adding embs to ${collection.name}`);
 
-await collection.add(
-  embs.map((emb, i) => i.toString()),
-  undefined,
-  embs.map(it => it.metadata),
-  embs.map(it => it.pageContent),
+await collection.add({
+  ids: embs.map((emb, i) => i.toString()),
+  metadatas: embs.map(it => {
+    return {
+      source: it.metadata.source,
+      l_from: it.metadata.loc.lines.from,
+      l_to: it.metadata.loc.lines.to,
+    }
+  }),
+  documents: embs.map(it => it.pageContent),
+}
 )
 
 console.log("done");

@@ -12,7 +12,6 @@ const chroma = new Chroma(embeddings.embeddings(), {
   url: process.env.CHROMA_DB_URL,
 })
 
-await chroma.ensureCollection()
 await chroma.addDocuments(embs)
 
 console.log("done");
