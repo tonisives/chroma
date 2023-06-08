@@ -3,7 +3,11 @@ import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 import cohere from "cohere-ai"
 
-let client = new ChromaClient("http://18.246.10.12:8000")
+// export let CHROMA_URL = "http://18.246.10.12:8000"
+export let CHROMA_URL = "http://0.0.0.0:8000"
+let client = new ChromaClient({ path: CHROMA_URL })
+let contestName = "2023-05-maia"
+
 
 export const calcHash = (input: string) => {
   return crypto.createHash('sha256').update(input).digest('hex').slice(0, 4)
@@ -15,8 +19,6 @@ export type Config = {
   ef: OpenAIEmbeddingFunction | CohereEmbeddingFunction
 }
 
-export let contestName = "ah-00000000-3a7b-2023-05-base"
-
 const openAiConfig = (): Config => {
   console.log("using openai")
 
@@ -27,8 +29,10 @@ const openAiConfig = (): Config => {
   let collection_name = `ah-00000000-${model_hash}-${contestName}`
 
   let ef = new OpenAIEmbeddingFunction(
-    process.env.OPENAI_TOKEN ?? "",
-    model_name
+    {
+      openai_api_key: process.env.OPENAI_TOKEN ?? "",
+      openai_model: model_name
+    }
   )
 
   return {
@@ -45,9 +49,10 @@ const cohereConfig = () => {
 
   let collection_name = `ah-00000000-${model_hash}-${contestName}`
 
-  let ef = new CohereEmbeddingFunction(
-    process.env.COHERE_TOKEN ?? ""
-  )
+  let ef = new CohereEmbeddingFunction({
+    cohere_api_key: process.env.COHERE_TOKEN ?? "",
+    model: model_name
+  })
 
   return {
     client,

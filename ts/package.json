@@ -6,9 +6,10 @@
     "@aws-sdk/client-dynamodb": "^3.338.0",
     "@aws-sdk/lib-dynamodb": "^3.338.0",
     "@aws-sdk/util-dynamodb": "^3.338.0",
-    "chromadb": "1.4.1",
+    "add": "^2.0.6",
+    "chromadb": "1.5.2",
     "cohere-ai": "^6.2.1",
-    "langchain": "https://github.com/tonisives/langchainjs#head=ah&workspace=langchain",
+    "langchain": "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb",
     "markdown-it": "^13.0.1",
     "markdown-it-terminal": "^0.4.0",
     "openai": "^3.2.1"

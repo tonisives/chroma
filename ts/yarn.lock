@@ -947,6 +947,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"add@npm:^2.0.6":
+  version: 2.0.6
+  resolution: "add@npm:2.0.6"
+  checksum: e2d23d40494565dfed4acd65e478570c444db5ac6c053551ed429c39ea0f2c99d83df63e7befec936df601827d2254d06a2fb6f7dcfd2022e810b25eab818b8c
+  languageName: node
+  linkType: hard
+
 "ansi-styles@npm:^3.0.0":
   version: 3.2.1
   resolution: "ansi-styles@npm:3.2.1"
@@ -1033,12 +1040,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromadb@npm:1.4.1":
-  version: 1.4.1
-  resolution: "chromadb@npm:1.4.1"
-  dependencies:
-    axios: ^0.26.0
-  checksum: 2b8e02e86577947e9f32d3faadb614b1a0ce60114d383ba7dd9997b519b1ff8e0b38f1a5c132371636ab07ed53f57b45cde3b454bcaa6710d5468358e1634114
+"chromadb@npm:1.5.2":
+  version: 1.5.2
+  resolution: "chromadb@npm:1.5.2"
+  checksum: 8eace35a0baed74db78695682984ba4263390eaac15e093241bc318ec377e341f12e11c282b76802633df95334203ae1f2173e5ba13cf32b1c5963f0b0a95153
   languageName: node
   linkType: hard
 
@@ -1201,9 +1206,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"langchain@https://github.com/tonisives/langchainjs#head=ah&workspace=langchain":
-  version: 0.0.78
-  resolution: "langchain@https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=ad8a260c25ca07b2fa3beedf4cb90495cbf9f7ff"
+"langchain@https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb":
+  version: 0.0.91
+  resolution: "langchain@https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb"
   dependencies:
     "@anthropic-ai/sdk": ^0.4.3
     ansi-styles: ^5.0.0
@@ -1228,28 +1233,38 @@ __metadata:
     "@aws-sdk/client-sagemaker-runtime": ^3.310.0
     "@clickhouse/client": ^0.0.14
     "@getmetal/metal-sdk": "*"
+    "@getzep/zep-js": ^0.3.1
+    "@gomomento/sdk": ^1.23.0
     "@huggingface/inference": ^1.5.1
     "@opensearch-project/opensearch": "*"
     "@pinecone-database/pinecone": "*"
+    "@qdrant/js-client-rest": ^1.2.0
+    "@supabase/postgrest-js": ^1.1.1
     "@supabase/supabase-js": ^2.10.0
     "@tensorflow-models/universal-sentence-encoder": "*"
     "@tensorflow/tfjs-converter": "*"
     "@tensorflow/tfjs-core": "*"
-    "@zilliz/milvus2-sdk-node": ^2.2.0
+    "@tigrisdata/vector": ^1.1.0
+    "@upstash/redis": ^1.20.6
+    "@zilliz/milvus2-sdk-node": ">=2.2.7"
     apify-client: ^2.7.1
     axios: "*"
     cheerio: ^1.0.0-rc.12
-    chromadb: ^1.4.0
+    chromadb: ^1.5.2
     cohere-ai: ^5.0.2
     d3-dsv: ^2.0.0
     epub2: ^3.0.1
-    faiss-node: ^0.1.1
+    faiss-node: ^0.2.1
+    google-auth-library: ^8.8.0
     hnswlib-node: ^1.4.2
     html-to-text: ^9.0.5
+    ignore: ^5.2.0
     mammoth: "*"
-    meriyah: "*"
     mongodb: ^5.2.0
+    mysql2: ^3.3.3
     pdf-parse: 1.1.1
+    peggy: ^3.0.2
+    pg: ^8.11.0
     pickleparser: ^0.1.0
     playwright: ^1.32.1
     puppeteer: ^19.7.2
@@ -1271,11 +1286,19 @@ __metadata:
       optional: true
     "@getmetal/metal-sdk":
       optional: true
+    "@getzep/zep-js":
+      optional: true
+    "@gomomento/sdk":
+      optional: true
     "@huggingface/inference":
       optional: true
     "@opensearch-project/opensearch":
       optional: true
     "@pinecone-database/pinecone":
+      optional: true
+    "@qdrant/js-client-rest":
+      optional: true
+    "@supabase/postgrest-js":
       optional: true
     "@supabase/supabase-js":
       optional: true
@@ -1284,6 +1307,10 @@ __metadata:
     "@tensorflow/tfjs-converter":
       optional: true
     "@tensorflow/tfjs-core":
+      optional: true
+    "@tigrisdata/vector":
+      optional: true
+    "@upstash/redis":
       optional: true
     "@zilliz/milvus2-sdk-node":
       optional: true
@@ -1303,17 +1330,25 @@ __metadata:
       optional: true
     faiss-node:
       optional: true
+    google-auth-library:
+      optional: true
     hnswlib-node:
       optional: true
     html-to-text:
       optional: true
-    mammoth:
+    ignore:
       optional: true
-    meriyah:
+    mammoth:
       optional: true
     mongodb:
       optional: true
+    mysql2:
+      optional: true
     pdf-parse:
+      optional: true
+    peggy:
+      optional: true
+    pg:
       optional: true
     pickleparser:
       optional: true
@@ -1331,7 +1366,7 @@ __metadata:
       optional: true
     weaviate-ts-client:
       optional: true
-  checksum: 4c695fddeda9d11792155d6cb80550280afa6848895c44284eb2e31aec1b2957cb2557036c57a1addfe789f29f3fa0b37c7f078be61fd973e55a6c2d2aa87d53
+  checksum: 1f1ae3c0eff296aa24072821e2a5e522adfe9a0f8e05b971bb0eb2aa0ef53cefa9dadadf8b316fa93b7ca55f6a5e71789e2819c98a8fe549e8cc9afc98a907cd
   languageName: node
   linkType: hard
 
@@ -1577,9 +1612,10 @@ __metadata:
     "@aws-sdk/lib-dynamodb": ^3.338.0
     "@aws-sdk/util-dynamodb": ^3.338.0
     "@types/node": ^20.2.1
-    chromadb: 1.4.1
+    add: ^2.0.6
+    chromadb: 1.5.2
     cohere-ai: ^6.2.1
-    langchain: "https://github.com/tonisives/langchainjs#head=ah&workspace=langchain"
+    langchain: "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb"
     markdown-it: ^13.0.1
     markdown-it-terminal: ^0.4.0
     openai: ^3.2.1
