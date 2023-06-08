@@ -64,5 +64,25 @@
         "./src/listCollections.ts"
       ]
     },
+    {
+      "name": "lj: addEmbsJson",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/langchain/addEmbsJson.ts"
+      ]
+    },
+    {
+      "name": "lj: getCount",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/langchain/getCount.ts"
+      ]
+    },
   ]
 }
