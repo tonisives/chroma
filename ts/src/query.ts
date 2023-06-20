@@ -1,4 +1,4 @@
-import { config } from "./config.js";
+import { config, openAiConfig } from "./config.js";
 import { logMarkdown } from "./terminal.js";
 
 let { client, collection_name, ef } = config
@@ -7,9 +7,15 @@ let query = "Where are the tokens transferred in code?"
 
 console.log(`querying collection ${collection_name} for\n${query}`);
 
+// let collection = await client.getOrCreateCollection({
+//   name: collection_name,
+//   embeddingFunction: ef
+// })
+
+
 let collection = await client.getOrCreateCollection({
-  name: collection_name,
-  embeddingFunction: ef
+  name: "ah-00000000-fc9d-findings",
+  embeddingFunction: openAiConfig().ef
 })
 
 let result = (await collection.query({

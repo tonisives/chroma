@@ -3,11 +3,12 @@ import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 import cohere from "cohere-ai"
 
-export let CHROMA_URL = "http://18.246.10.12:8000"
-// export let CHROMA_URL = "http://0.0.0.0:8000"
+// export let CHROMA_URL = "http://18.246.10.12:8000"
+export let CHROMA_URL = "https://5c04-171-96-190-216.ngrok-free.app"
+process.env.CHROMA_DB_URL = CHROMA_URL
 
 let client = new ChromaClient({ path: CHROMA_URL })
-export let contestName = "2023-05-maia"
+export let contestName = "2023-05-Index"
 
 console.log(`using chroma at ${CHROMA_URL}`)
 
@@ -24,8 +25,7 @@ export type Config = {
 const openAiConfig = (): Config => {
   console.log("using openai")
 
-  // let model_name = "text-embedding-ada-002"
-  let model_name = "cohere-large"
+  let model_name = "text-embedding-ada-002"
   let model_hash = calcHash(model_name)
 
   let collection_name = `ah-00000000-${model_hash}-${contestName}`
@@ -64,5 +64,5 @@ const cohereConfig = () => {
 }
 
 
-export let config = cohereConfig()
+export let config = openAiConfig()
 

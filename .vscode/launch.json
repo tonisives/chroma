@@ -84,5 +84,15 @@
         "./src/langchain/getCount.ts"
       ]
     },
+    {
+      "name": "lc: query emb",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/langchain/queryEmb.ts"
+      ]
+    },
   ]
 }
