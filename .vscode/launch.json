@@ -35,6 +35,16 @@
       ]
     },
     {
+      "name": "delete findings",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/deleteFindings.ts"
+      ]
+    },
+    {
       "name": "query collection",
       "type": "node",
       "request": "launch",

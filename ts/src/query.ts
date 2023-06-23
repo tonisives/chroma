@@ -1,4 +1,4 @@
-import { config, openAiConfig } from "./config.js";
+import { config, getEmbeddings } from "./config.js";
 import { logMarkdown } from "./terminal.js";
 
 let { client, collection_name, ef } = config
@@ -15,12 +15,19 @@ console.log(`querying collection ${collection_name} for\n${query}`);
 
 let collection = await client.getOrCreateCollection({
   name: "ah-00000000-fc9d-findings",
-  embeddingFunction: openAiConfig().ef
+  embeddingFunction: getEmbeddings("fc9d")
 })
 
 let result = (await collection.query({
   nResults: 10,
-  queryTexts: [query]
+  queryTexts: ["some info"],
+  where: {
+    c_name: {
+      $eq: "2023-05-dodo"
+    }
+  }
+  // queryTexts: [query]
+
 }))
 
 if ((result as any).error) {

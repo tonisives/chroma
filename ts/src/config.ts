@@ -4,7 +4,7 @@ import { ChromaClient } from 'chromadb'
 import cohere from "cohere-ai"
 
 // export let CHROMA_URL = "http://18.246.10.12:8000"
-export let CHROMA_URL = "https://5c04-171-96-190-216.ngrok-free.app"
+export let CHROMA_URL = "https://6c6e-124-122-187-3.ngrok-free.app"
 process.env.CHROMA_DB_URL = CHROMA_URL
 
 let client = new ChromaClient({ path: CHROMA_URL })
@@ -64,5 +64,30 @@ const cohereConfig = () => {
 }
 
 
-export let config = openAiConfig()
+export let config = cohereConfig()
 
+// ---
+
+export const ALL_EMB_TYPES = [
+  "85ab", // text-embedding-ada-002-recursive-split
+  "fc9d", // text-embedding-ada-002-code-only
+  "88a2", // cohere-large-recursive-split
+  "7722", // cohere-large-code-only
+  // unused
+  // "8b70", // text-embedding-ada-002 (full)
+  // "3a7b", // cohere-large (full)
+]
+export type EmbTuple = typeof ALL_EMB_TYPES
+export type EmbType = EmbTuple[number]
+
+export let getEmbeddings = (embType: EmbType): OpenAIEmbeddingFunction | CohereEmbeddingFunction => {
+  switch (embType) {
+    case "8b70": return openAiConfig().ef
+    case "85ab": return openAiConfig().ef
+    case "fc9d": return openAiConfig().ef
+    case "3a7b": return cohereConfig().ef
+    case "88a2": return cohereConfig().ef
+    case "7722": return cohereConfig().ef
+    default: throw new Error(`unknown embType ${embType}`)
+  }
+}

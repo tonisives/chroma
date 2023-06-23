@@ -1,4 +1,4 @@
-import { config } from "../config.js";
+import { config, getEmbeddings } from "../config.js";
 // import { Chroma } from "langchain/vectorstores/chroma"
 import { logMarkdown } from "../terminal.js";
 import { ChromaClient } from "chromadb";
@@ -27,18 +27,37 @@ let query = "token transfer"
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
   name: "ah-00000000-fc9d-findings",
-  embeddingFunction: ef
+  embeddingFunction: getEmbeddings("fc9d")
 })
 
-let date = Math.floor((new Date("2023-06")).getTime() / 1000)
+let date = Math.floor((new Date("2023-04")).getTime() / 1000)
 let results = await collection?.query({
   queryTexts: [query],
-  where: {
-    "c_date": {
-      "$lt": date
-    }
-  }
+  // where: {
+  //   $and: [
+  //     {
+  //       c_date: {
+  //         $gt: date
+  //       }
+  //     },
+  //     {
+  //       $or: [
+  //         {
+  //           severity: {
+  //             $eq: 2
+  //           }
+  //         },
+  //         {
+  //           severity: {
+  //             $eq: 3
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // } as any
 })
+
 
 let responseText = `${results?.documents[0].map((it, index) => ` -- ${index + 1}. ${JSON.stringify(results.metadatas[0][index], null, 2)}\n${it}`).join("\n")}`
 

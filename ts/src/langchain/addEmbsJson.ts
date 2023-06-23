@@ -1,13 +1,13 @@
 import { config } from "../config.js";
 import embs from "../sample/embs.json";
 import { Chroma } from "langchain/vectorstores/chroma"
-import { embeddings } from "./conf.js";
+import { lcEmbeddings } from "./conf.js";
 
 let { client, collection_name, ef } = config
 
 console.log("start");
 
-const chroma = new Chroma(embeddings.embeddings(), {
+const chroma = new Chroma(lcEmbeddings.embeddings(), {
   collectionName: collection_name,
   url: process.env.CHROMA_DB_URL,
 })

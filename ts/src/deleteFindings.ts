@@ -1,15 +1,14 @@
 import { DynamoDBDocumentClient, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
-import { config, contestName } from "./config.js";
+import { config } from "./config.js";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 let { client, collection_name, ef } = config
 
-console.log(`deleting collection ${collection_name}`);
+let contestName = "2023-05-blueberry"
 
-await client.deleteCollection({ name: collection_name })
+console.log(`deleting findings ${collection_name}`);
 
 let collections = [
-  // "ah-00000000-88a2-2023-06-real-wagmi",
   "ah-00000000-85ab-findings",
   "ah-00000000-fc9d-findings",
   "ah-00000000-88a2-findings",
@@ -19,36 +18,41 @@ let collections = [
   // "ah-00000000-8b70-findings",
 ]
 
-for (let collection of collections) {
-  console.log(`deleting collection ${collection}`);
-  await client.deleteCollection({ name: collection })
+
+for (let collectionName of collections) {
+  let collection = await client.getCollection({
+    name: collectionName,
+    embeddingFunction: ef
+  })
+
+  await collection.delete({
+    where: {
+      c_name: {
+        $eq: contestName
+      }
+    }
+  })
 }
 
-// also delete em_stored from aws
-
+// also update em_stored in aws
 try {
-  let table = "ah_contest_2"
+  let table = "ah_finding_7"
 
   let input: UpdateCommandInput = {
     TableName: table,
     Key: {
-      pk: `${contestName}`,
-      sk: "0"
+      pk: `${contestName}`
     },
-    UpdateExpression: "set em_stored = :em_stored",
-    ExpressionAttributeValues: {
-      ":em_stored": false
-    }
+    UpdateExpression: "remove c_embs_s",
   }
 
   let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
-
   await client.send(new UpdateCommand(input))
-
 }
 catch (e) {
   console.log(`didn't delete from aws: ${e}`)
 }
+
 
 console.log("done");
 process.exit(0)
