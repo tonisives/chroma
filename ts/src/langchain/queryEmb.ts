@@ -3,8 +3,6 @@ import { config, getEmbeddings } from "../config.js";
 import { logMarkdown } from "../terminal.js";
 import { ChromaClient } from "chromadb";
 
-let { client, collection_name, ef } = config
-
 console.log("start");
 
 // const chroma = new Chroma(embeddings.embeddings, {
@@ -26,13 +24,17 @@ let query = "token transfer"
 
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
-  name: "ah-00000000-88a2-findings",
-  embeddingFunction: getEmbeddings("fc9d")
+  // name: "ah-00000000-3a7b-2023-06-real-wagmi"
+  name: "ah-00000000-88a2-findings"
 })
+let ef = getEmbeddings("88a2")
+
+
+let embQuery = await ef.generate([query])
 
 let date = Math.floor((new Date("2023-04")).getTime() / 1000)
 let results = await collection?.query({
-  queryTexts: [query],
+  queryEmbeddings: embQuery,
   // where: {
   //   $and: [
   //     {

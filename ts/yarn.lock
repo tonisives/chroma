@@ -1040,10 +1040,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromadb@npm:1.5.2":
+"chromadb@tonisives/chroma#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a":
   version: 1.5.2
-  resolution: "chromadb@npm:1.5.2"
-  checksum: 8eace35a0baed74db78695682984ba4263390eaac15e093241bc318ec377e341f12e11c282b76802633df95334203ae1f2173e5ba13cf32b1c5963f0b0a95153
+  resolution: "chromadb@https://github.com/tonisives/chroma.git#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a"
+  checksum: 791248f189f798d6935a024c43390ad23efb10c1af6c5562f53ad4759b3e2edc4043b1776702eae12b66e9344b8cfc8d23cc8c75752fd5a9371bc8839345f4d1
   languageName: node
   linkType: hard
 
@@ -1056,10 +1056,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"cohere-ai@npm:^6.2.1":
-  version: 6.2.1
-  resolution: "cohere-ai@npm:6.2.1"
-  checksum: c3fe95ba202cfd846bc34f673299cc14312996819101e8cfcc2d047ff7ca1aad78e86283b2045879b454b0c6869fc96056f398387558237f8de8cc342f1ca48a
+"cohere-ai@npm:^6.2.2":
+  version: 6.2.2
+  resolution: "cohere-ai@npm:6.2.2"
+  checksum: 5a7ea2bb6f2a6b83de7ec90612a38f0b215bfc199b5fe749842c6e771a1b183681a3a0e351d75c22eb6d929ea45cf03b1cdf4ed3a907c401186e73c392749310
   languageName: node
   linkType: hard
 
@@ -1613,8 +1613,8 @@ __metadata:
     "@aws-sdk/util-dynamodb": ^3.338.0
     "@types/node": ^20.2.1
     add: ^2.0.6
-    chromadb: 1.5.2
-    cohere-ai: ^6.2.1
+    chromadb: "tonisives/chroma#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a"
+    cohere-ai: ^6.2.2
     langchain: "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb"
     markdown-it: ^13.0.1
     markdown-it-terminal: ^0.4.0
