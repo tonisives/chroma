@@ -10,10 +10,10 @@ await client.deleteCollection({ name: collection_name })
 
 let collections = [
   // "ah-00000000-88a2-2023-06-real-wagmi",
-  "ah-00000000-85ab-findings",
+  // "ah-00000000-85ab-findings",
   "ah-00000000-fc9d-findings",
-  "ah-00000000-88a2-findings",
-  "ah-00000000-7722-findings"
+  // "ah-00000000-88a2-findings",
+  // "ah-00000000-7722-findings"
   // unused
   // "ah-00000000-3a7b-findings",
   // "ah-00000000-8b70-findings",

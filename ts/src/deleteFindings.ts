@@ -1,23 +1,18 @@
 import { DynamoDBDocumentClient, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
-import { config } from "./config.js";
+import { EmbType, config } from "./config.js";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
 let { client, collection_name, ef } = config
 
-let contestName = "2023-05-blueberry"
-
-console.log(`deleting findings ${collection_name}`);
-
-let collections = [
-  "ah-00000000-85ab-findings",
-  "ah-00000000-fc9d-findings",
-  "ah-00000000-88a2-findings",
-  "ah-00000000-7722-findings"
-  // unused
-  // "ah-00000000-3a7b-findings",
-  // "ah-00000000-8b70-findings",
+let contestName = "2023-05-dodo"
+let embTypes: [EmbType] = [
+  // "85ab",
+  // "fc9d",
+  "88a2"
+  // "7722"
 ]
 
+let collections = embTypes.map(it => `ah-00000000-${it}-findings`)
 
 for (let collectionName of collections) {
   let collection = await client.getCollection({
@@ -35,23 +30,33 @@ for (let collectionName of collections) {
 }
 
 // also update em_stored in aws
-try {
-  let table = "ah_finding_7"
 
-  let input: UpdateCommandInput = {
-    TableName: table,
-    Key: {
-      pk: `${contestName}`
-    },
-    UpdateExpression: "remove c_embs_s",
+const deleteEmbsS = async (embType: EmbType) => {
+  try {
+    let table = "ah_finding_7"
+
+    let input: UpdateCommandInput = {
+      TableName: table,
+      Key: {
+        pk: `${contestName}`
+      },
+      UpdateExpression: "delete c_embs_s :embs_s",
+      ExpressionAttributeValues: {
+        ":embs_s": new Set([embType])
+      }
+    }
+
+    let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+    await client.send(new UpdateCommand(input))
+    console.log(`deleted ${embType} from aws`)
   }
+  catch (e) {
+    console.log(`didn't delete from aws: ${e}`)
+  }
+}
 
-  let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
-  await client.send(new UpdateCommand(input))
-}
-catch (e) {
-  console.log(`didn't delete from aws: ${e}`)
-}
+let deleteEmbs = embTypes.map(it => deleteEmbsS(it))
+await Promise.all(deleteEmbs)
 
 
 console.log("done");

@@ -1,10 +1,9 @@
 import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
-import cohere from "cohere-ai"
 
 // export let CHROMA_URL = "http://18.246.10.12:8000"
-export let CHROMA_URL = "https://6c6e-124-122-187-3.ngrok-free.app"
+export let CHROMA_URL = "https://27e3-2001-fb1-76-d1f1-c992-43be-f54a-eeae.ngrok-free.app"
 process.env.CHROMA_DB_URL = CHROMA_URL
 
 let client = new ChromaClient({ path: CHROMA_URL })
@@ -53,7 +52,7 @@ const cohereConfig = () => {
 
   let ef = new CohereEmbeddingFunction({
     cohere_api_key: process.env.COHERE_TOKEN ?? "",
-    // model: "large"
+    model: "large"
   })
 
   return {

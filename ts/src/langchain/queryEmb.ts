@@ -26,7 +26,7 @@ let query = "token transfer"
 
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
-  name: "ah-00000000-fc9d-findings",
+  name: "ah-00000000-88a2-findings",
   embeddingFunction: getEmbeddings("fc9d")
 })
 
@@ -58,10 +58,12 @@ let results = await collection?.query({
   // } as any
 })
 
+if ((results as any).error) {
+  console.log(`error: ${(results as any).error}`);
+  process.exit(1)
+}
 
 let responseText = `${results?.documents[0].map((it, index) => ` -- ${index + 1}. ${JSON.stringify(results.metadatas[0][index], null, 2)}\n${it}`).join("\n")}`
-
-
 
 logMarkdown(`## Query: ${query}`)
 logMarkdown(responseText)
