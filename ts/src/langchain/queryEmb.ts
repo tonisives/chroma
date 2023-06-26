@@ -1,4 +1,4 @@
-import { config, getEmbeddings } from "../config.js";
+import { EmbTuple, EmbType, config, getEmbeddings } from "../config.js";
 // import { Chroma } from "langchain/vectorstores/chroma"
 import { logMarkdown } from "../terminal.js";
 import { ChromaClient } from "chromadb";
@@ -21,13 +21,13 @@ console.log("start");
 
 let query = "token transfer"
 
-
+let emb: EmbType = "7722" // 7722
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-06-real-wagmi"
-  name: "ah-00000000-88a2-findings"
+  name: `ah-00000000-${emb}-findings`
 })
-let ef = getEmbeddings("88a2")
+let ef = getEmbeddings(emb)
 
 
 let embQuery = await ef.generate([query])
@@ -35,6 +35,9 @@ let embQuery = await ef.generate([query])
 let date = Math.floor((new Date("2023-04")).getTime() / 1000)
 let results = await collection?.query({
   queryEmbeddings: embQuery,
+  // where: {
+  //   c_name: "2023-04-footium"
+  // }
   // where: {
   //   $and: [
   //     {
@@ -65,7 +68,12 @@ if ((results as any).error) {
   process.exit(1)
 }
 
-let responseText = `${results?.documents[0].map((it, index) => ` -- ${index + 1}. ${JSON.stringify(results.metadatas[0][index], null, 2)}\n${it}`).join("\n")}`
+// let responseText = `${results?.documents[0].map((it, index) =>
+//   ` -- ${index + 1}. ${JSON.stringify(results.metadatas[0][index], null,
+//   2)}\n${it}`).join("\n")}`
+
+let responseText = `${results?.documents[0].map((it, index) =>
+  `${(results.metadatas[0][index] as any).source} - ${(results.metadatas[0][index] as any).loc.lines.from}`).join("\n")}`
 
 logMarkdown(`## Query: ${query}`)
 logMarkdown(responseText)
