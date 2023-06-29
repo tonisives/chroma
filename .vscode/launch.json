@@ -45,6 +45,16 @@
       ]
     },
     {
+      "name": "delete contests",
+      "type": "node",
+      "request": "launch",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/deleteContest.ts"
+      ]
+    },
+    {
       "name": "query collection",
       "type": "node",
       "request": "launch",
