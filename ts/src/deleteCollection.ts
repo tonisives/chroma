@@ -6,11 +6,13 @@ import { ddbDeleteEmbFromAllContests } from "./ddb.js";
 let { client } = config
 
 let collections = [
-  // "ah-00000000-3a7b-2023-06-arrakis",
-  // "ah-00000000-85ab-findings",
-  "ah-00000000-fc9d-findings", // this will delete only fc9d c_embs_s from ddb findings
+  // "ah-00000000-3a7b-2023-06-dodo",
 
-  // unused chroma (for now)
+  // -findings end: will delete only fc9d c_embs_s from ddb findings
+  // "ah-00000000-85ab-findings",
+  "ah-00000000-fc9d-findings",
+
+  // unused cohere (for now)
   // "ah-00000000-88a2-findings",
   // "ah-00000000-7722-findings"
   // unused
@@ -21,6 +23,10 @@ let collections = [
 for (let collection of collections) {
   console.log(`deleting collection ${collection}`);
   await client.deleteCollection({ name: collection })
+    .catch(e => {
+      console.log(`didn't delete from chroma: ${e}`)
+      process.exit(1)
+    })
 
   if (!collection.includes("findings")) {
     let contestName = collection.split("-").slice(3).join("-")
@@ -42,7 +48,6 @@ for (let collection of collections) {
       let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
       await client.send(new UpdateCommand(input))
-
     }
     catch (e) {
       console.log(`didn't delete from aws: ${e}`)

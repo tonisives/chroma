@@ -19,9 +19,9 @@ console.log("start");
 
 // langchain doesn't support chroma where query
 
-let query = "uint256[] memory _tradeAmounts = new uint256[](_tradeAssets.length);"
+let query = `any`
 
-let emb: EmbType = "85ab" // 7722
+let emb: EmbType = "85ab"
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-06-real-wagmi"
@@ -33,7 +33,13 @@ let embQuery = await ef.generate([query])
 
 let date = Math.floor((new Date("2023-04")).getTime() / 1000)
 let results = await collection?.query({
+  nResults: 1,
+  where: {
+    // source: "41a2853e",
+    c_name: "2022-12-gogopool"
+  },
   queryEmbeddings: embQuery,
+
   // where: {
   //   c_date: {
   //     $gt: date
@@ -50,29 +56,30 @@ let results = await collection?.query({
   // }
 
 
-  where: {
-    $and: [
-      {
-        c_date: {
-          $gt: date
-        }
-      },
-      {
-        $or: [
-          {
-            severity: {
-              $eq: 2
-            }
-          },
-          {
-            severity: {
-              $eq: 3
-            }
-          }
-        ]
-      }
-    ]
-  }
+
+  // where: {
+  //   $and: [
+  //     {
+  //       c_date: {
+  //         $gt: date
+  //       }
+  //     },
+  //     {
+  //       $or: [
+  //         {
+  //           severity: {
+  //             $eq: 2
+  //           }
+  //         },
+  //         {
+  //           severity: {
+  //             $eq: 3
+  //           }
+  //         }
+  //       ]
+  //     }
+  //   ]
+  // }
 })
 
 if ((results as any).error) {

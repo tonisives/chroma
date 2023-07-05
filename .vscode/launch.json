@@ -114,5 +114,18 @@
         "./src/langchain/queryEmb.ts"
       ]
     },
+    {
+      "name": "utils: update contests",
+      "type": "node",
+      "request": "launch",
+      "env": {
+        "AWS_PROFILE": "prod"
+      },
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/utils/updateContests.ts"
+      ]
+    },
   ]
 }
