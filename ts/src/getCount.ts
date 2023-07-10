@@ -5,7 +5,7 @@ let { client, collection_name, ef } = config
 console.log(`getting count for ${collection_name}`);
 
 let collection = await client.getCollection({
-  name: collection_name,
+  name: "ah-00000000-fc9d-findings",
 })
 
 let result = await collection.count().catch((e) => {

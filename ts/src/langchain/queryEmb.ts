@@ -19,7 +19,7 @@ console.log("start");
 
 // langchain doesn't support chroma where query
 
-let query = `any`
+let query = `langchain doesn't support chroma where query`
 
 let emb: EmbType = "85ab"
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
@@ -33,10 +33,10 @@ let embQuery = await ef.generate([query])
 
 let date = Math.floor((new Date("2023-04")).getTime() / 1000)
 let results = await collection?.query({
-  nResults: 1,
+  nResults: 2,
   where: {
     // source: "41a2853e",
-    c_name: "2022-12-gogopool"
+    // c_name: "2022-12-gogopool"
   },
   queryEmbeddings: embQuery,
 

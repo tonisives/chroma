@@ -3,7 +3,9 @@ import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 
 // export let CHROMA_URL = "http://18.246.10.12:8000"
-export let CHROMA_URL = "https://27e3-2001-fb1-76-d1f1-c992-43be-f54a-eeae.ngrok-free.app"
+// console.warn("WARN: PROD URL")
+
+export let CHROMA_URL = process.env.NGROK_URL
 process.env.CHROMA_DB_URL = CHROMA_URL
 
 let client = new ChromaClient({ path: CHROMA_URL })

@@ -47,10 +47,41 @@ export const deleteAddDate = async (contestName: string, index: number) => {
   }
 }
 
+export const setAddDate = async (contest: any, index: number) => {
+  if (index > 0) await new Promise(resolve => setTimeout(resolve, index * 50))
+
+  console.log(`adding c_add_date from ${contest.pk}`);
+
+  try {
+    let table = "ah_finding_7"
+    let date = contest.pk.split("-").slice(0, 2)
+    let epoch = (new Date(parseInt(date[0]), parseInt(date[1]) - 1)).getTime() * 1000
+
+
+    let input: UpdateCommandInput = {
+      TableName: table,
+      Key: {
+        pk: `${contest.pk}`
+      },
+      UpdateExpression: "set c_add_date = :c_add_date",
+      ExpressionAttributeValues: {
+        ":c_add_date": epoch
+      }
+    }
+
+    let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
+    await client.send(new UpdateCommand(input))
+    console.log(`deleted c_add_date for ${contest.pk}`)
+  }
+  catch (e) {
+    console.log(`didn't delete from aws: ${contest.pk} ${e}`)
+  }
+}
+
 let contests = await downloadExistingContests()
 
 let jobs = contests.map((contest, index) => {
-  return deleteAddDate(contest.pk, index)
+  return setAddDate(contest, index)
 })
 
 await Promise.all(jobs)
