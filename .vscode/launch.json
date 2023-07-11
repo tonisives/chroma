@@ -29,6 +29,9 @@
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",
+      "env": {
+        "AWS_PROFILE": "default"
+      },
       "runtimeExecutable": "tsx",
       "runtimeArgs": [
         "./src/deleteCollection.ts"
@@ -115,16 +118,29 @@
       ]
     },
     {
-      "name": "utils: update contests",
+      "name": "utils: update finding contest",
       "type": "node",
       "request": "launch",
       "env": {
-        "AWS_PROFILE": "prod"
+        "AWS_PROFILE": "default"
       },
       "cwd": "${workspaceFolder}/ts",
       "runtimeExecutable": "tsx",
       "runtimeArgs": [
-        "./src/utils/updateContests.ts"
+        "./src/utils/updateFindingContest.ts"
+      ]
+    },
+    {
+      "name": "utils: update contest contest",
+      "type": "node",
+      "request": "launch",
+      "env": {
+        "AWS_PROFILE": "default"
+      },
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/utils/updateContestContest.ts"
       ]
     },
   ]

@@ -29,7 +29,7 @@ export const ddbDeleteEmbFromAllContests = async (embType: EmbType) => {
 }
 
 export const deleteEmbsS = async (contestName: string, embType: EmbType, index: number = -1) => {
-  if (index > 0) await new Promise(resolve => setTimeout(resolve, index * 100))
+  if (index > 0) await new Promise(resolve => setTimeout(resolve, index * 50))
 
   try {
     let table = "ah_finding_7"

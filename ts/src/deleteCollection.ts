@@ -8,8 +8,8 @@ let { client } = config
 let collections = [
   // "ah-00000000-3a7b-2023-06-dodo",
 
-  // -findings end: will delete only fc9d c_embs_s from ddb findings
-  // "ah-00000000-85ab-findings",
+  // -findings end: will delete only fc9d c_embs_s from ddb finding_7 contests
+  "ah-00000000-85ab-findings",
   "ah-00000000-fc9d-findings",
 
   // unused cohere (for now)

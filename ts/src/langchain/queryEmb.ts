@@ -21,7 +21,7 @@ console.log("start");
 
 let query = `langchain doesn't support chroma where query`
 
-let emb: EmbType = "85ab"
+let emb: EmbType = "fc9d"
 let chroma = new ChromaClient({ path: process.env.CHROMA_DB_URL })
 let collection = await chroma.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-06-real-wagmi"

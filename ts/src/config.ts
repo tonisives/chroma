@@ -2,7 +2,7 @@ import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 
-// export let CHROMA_URL = "http://18.246.10.12:8000"
+// export let CHROMA_URL = "http://52.40.40.86:8000"
 // console.warn("WARN: PROD URL")
 
 export let CHROMA_URL = process.env.NGROK_URL
@@ -11,7 +11,8 @@ process.env.CHROMA_DB_URL = CHROMA_URL
 let client = new ChromaClient({ path: CHROMA_URL })
 export let contestName = "2023-05-Index"
 
-console.log(`using chroma at ${CHROMA_URL}`)
+console.log(`CHROMA_URL ${CHROMA_URL}`)
+console.log(`AWS_PROFILE ${process.env.AWS_PROFILE}`)
 
 export const calcHash = (input: string) => {
   return crypto.createHash('sha256').update(input).digest('hex').slice(0, 4)

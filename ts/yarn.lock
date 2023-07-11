@@ -1040,10 +1040,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromadb@tonisives/chroma#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a":
-  version: 1.5.2
-  resolution: "chromadb@https://github.com/tonisives/chroma.git#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a"
-  checksum: 791248f189f798d6935a024c43390ad23efb10c1af6c5562f53ad4759b3e2edc4043b1776702eae12b66e9344b8cfc8d23cc8c75752fd5a9371bc8839345f4d1
+"chromadb@tonisives/chroma#workspace=chromadb&commit=4107b6165d8ba41c1b690fe44002bee0cd17f52c":
+  version: 1.5.3
+  resolution: "chromadb@https://github.com/tonisives/chroma.git#workspace=chromadb&commit=4107b6165d8ba41c1b690fe44002bee0cd17f52c"
+  checksum: 61632b8581db307c163929700df5ba378789d3272d7ad9e75fd09832d8ae72465f26bc20ee56f2bc013f0c09cb21d9979f3c6cb221c89b76dbdefc74ff793a5d
   languageName: node
   linkType: hard
 
@@ -1613,7 +1613,7 @@ __metadata:
     "@aws-sdk/util-dynamodb": ^3.338.0
     "@types/node": ^20.2.1
     add: ^2.0.6
-    chromadb: "tonisives/chroma#workspace=chromadb&commit=02d4db5aebb6d4eb4f3b33b7e026838d8f09522a"
+    chromadb: "tonisives/chroma#workspace=chromadb&commit=4107b6165d8ba41c1b690fe44002bee0cd17f52c"
     cohere-ai: ^6.2.2
     langchain: "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb"
     markdown-it: ^13.0.1
