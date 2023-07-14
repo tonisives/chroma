@@ -3,31 +3,22 @@ import { logMarkdown } from "./terminal.js";
 
 let { client, collection_name, ef } = config
 
-let query = "Where are the tokens transferred in code?"
-
-console.log(`querying collection ${collection_name} for\n${query}`);
-
-// let collection = await client.getOrCreateCollection({
-//   name: collection_name,
-//   embeddingFunction: ef
-// })
-
-
 let collection = await client.getOrCreateCollection({
-  name: "ah-00000000-fc9d-findings",
+  name: "ah-00000000-3a7b-2023-07-pooltogether",
   embeddingFunction: getEmbeddings("fc9d")
 })
 
+console.log(`querying ${collection.name}'s ${await collection.count()} documents for token transfer`);
+
 let result = (await collection.query({
   nResults: 10,
-  queryTexts: ["some info"],
-  where: {
-    c_name: {
-      $eq: "2023-05-dodo"
-    }
-  }
+  queryTexts: ["token transfer"],
+  // where: {
+  //   c_name: {
+  //     $eq: "2023-05-dodo"
+  //   }
+  // }
   // queryTexts: [query]
-
 }))
 
 if ((result as any).error) {
@@ -46,7 +37,7 @@ if ((result as any).error) {
 // console.log(`results: ${JSON.stringify(result, undefined, 2)}`);
 
 // print results
-logMarkdown("# start")
+logMarkdown(`# start ${result.documents[0].length} results`)
 
 for (let i = 0; i < result.documents[0].length; i++) {
   // logMarkdown(`# --- ${result.metadatas?[0][i] } ${result.metadatas[0][i].loc.lines.from}:${result.metadatas[0][i].loc.lines.to}`)

@@ -58,13 +58,24 @@
       ]
     },
     {
-      "name": "query collection",
+      "name": "query emb",
       "type": "node",
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",
       "runtimeExecutable": "tsx",
       "runtimeArgs": [
         "./src/query.ts"
+      ]
+    },
+    {
+      "name": "query emb bulk",
+      "type": "node",
+      "request": "launch",
+      "console": "integratedTerminal",
+      "cwd": "${workspaceFolder}/ts",
+      "runtimeExecutable": "tsx",
+      "runtimeArgs": [
+        "./src/query-bulk.ts"
       ]
     },
     {

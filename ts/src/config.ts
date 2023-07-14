@@ -2,10 +2,10 @@ import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 
-// export let CHROMA_URL = "http://52.40.40.86:8000"
-// console.warn("WARN: PROD URL")
+export let CHROMA_URL = "http://54.191.17.128:8000"
+console.warn("WARN: PROD URL")
 
-export let CHROMA_URL = process.env.NGROK_URL
+// export let CHROMA_URL = process.env.NGROK_URL
 process.env.CHROMA_DB_URL = CHROMA_URL
 
 let client = new ChromaClient({ path: CHROMA_URL })
@@ -25,8 +25,6 @@ export type Config = {
 }
 
 const openAiConfig = (): Config => {
-  console.log("using openai")
-
   let model_name = "text-embedding-ada-002"
   let model_hash = calcHash(model_name)
 
@@ -47,7 +45,6 @@ const openAiConfig = (): Config => {
 }
 
 const cohereConfig = () => {
-  console.log("using cohere")
   let model_name = "cohere-large"
   let model_hash = calcHash(model_name)
 
