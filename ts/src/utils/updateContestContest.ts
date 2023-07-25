@@ -1,6 +1,8 @@
 import { DynamoDBDocumentClient, ScanCommand, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 
+console.log(`AWS_PROFILE ${process.env.AWS_PROFILE}`)
+
 let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 
 export const downloadExistingContests = async () => {

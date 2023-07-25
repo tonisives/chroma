@@ -15,10 +15,10 @@ for (let i = 0; i < collections.length; i++) {
   let count = await obj.count()
   console.log(`items count: ${count}`);
 
-  if (collections[i].name.includes("findings")) {
-    let items = await obj.peek({ limit: 3 })
-    console.log(`peek: ${JSON.stringify(items, undefined, 2)}`);
-  }
+  // if (collections[i].name.includes("findings")) {
+  let items = await obj.peek({ limit: 3 })
+  console.log(`peek: ${JSON.stringify(items, undefined, 2)}`);
+  // }
 }
 
 process.exit(0)

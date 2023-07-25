@@ -7,11 +7,11 @@ let { client } = config
 
 let collections = [
   // contest - will remove em_stored from contests_2
-  `ah-00000000-${embNames.adaRecursive500}-2023-06-Index`,
+  // `ah-00000000-${embNames.adaRecursive500}-2023-06-Index`,
 
   // -findings end: will delete only fc9d c_embs_s from ddb finding_7 contests
-  // "ah-00000000-85ab-findings",
-  // "ah-00000000-fc9d-findings",
+  "ah-00000000-85ab-findings",
+  "ah-00000000-fc9d-findings",
 
   // unused cohere (for now)
   // "ah-00000000-88a2-findings",

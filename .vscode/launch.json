@@ -30,7 +30,7 @@
       "request": "launch",
       "cwd": "${workspaceFolder}/ts",
       "env": {
-        "AWS_PROFILE": "default"
+        "AWS_PROFILE": "prod"
       },
       "runtimeExecutable": "tsx",
       "runtimeArgs": [
@@ -133,7 +133,7 @@
       "type": "node",
       "request": "launch",
       "env": {
-        "AWS_PROFILE": "default"
+        "AWS_PROFILE": "prod"
       },
       "cwd": "${workspaceFolder}/ts",
       "runtimeExecutable": "tsx",
@@ -146,7 +146,7 @@
       "type": "node",
       "request": "launch",
       "env": {
-        "AWS_PROFILE": "default"
+        "AWS_PROFILE": "prod"
       },
       "cwd": "${workspaceFolder}/ts",
       "runtimeExecutable": "tsx",
