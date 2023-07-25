@@ -5,6 +5,22 @@ import { deleteEmbsS } from "./ddb.js";
 
 let { client } = config
 
+let collection = await client.getCollection({
+  name: "ah-00000000-7f50-findings",
+  embeddingFunction: getEmbeddings("7f50")
+})
+
+await collection.delete({
+  where: {
+    severity: {
+      $eq: 1
+    }
+  }
+})
+
+process.exit(0)
+
+
 let contestNames = ["2022-08-prepo",
   "2022-09-nouns-builder"]
 

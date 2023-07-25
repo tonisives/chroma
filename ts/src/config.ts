@@ -2,12 +2,13 @@ import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 
-export let CHROMA_URL = "http://54.191.17.128:8000"
+export let CHROMA_URL = "http://54.189.40.202:8000"
 console.warn("WARN: PROD URL")
 
 // export let CHROMA_URL = process.env.NGROK_URL
-process.env.CHROMA_DB_URL = CHROMA_URL
 
+
+process.env.CHROMA_DB_URL = CHROMA_URL
 let client = new ChromaClient({ path: CHROMA_URL })
 export let contestName = "2023-05-Index"
 
@@ -67,14 +68,24 @@ export let config = cohereConfig()
 
 // ---
 
+export let embNames = {
+  adaFull: "8b70",
+  adaRecursive: "85ab",
+  adaRecursive500: "7f50",
+  adaCodeOnly: "fc9d",
+  cohereFull: "3a7b",
+  cohereRecursive: "88a2",
+  cohereCodeOnly: "7722",
+}
+
 export const ALL_EMB_TYPES = [
-  "85ab", // text-embedding-ada-002-recursive-split
-  "fc9d", // text-embedding-ada-002-code-only
-  "88a2", // cohere-large-recursive-split
-  "7722", // cohere-large-code-only
-  // unused
-  // "8b70", // text-embedding-ada-002 (full)
-  // "3a7b", // cohere-large (full)
+  embNames.adaFull,
+  embNames.adaRecursive,
+  embNames.adaRecursive500,
+  embNames.adaCodeOnly,
+  embNames.cohereFull,
+  embNames.cohereRecursive,
+  embNames.cohereCodeOnly
 ]
 export type EmbTuple = typeof ALL_EMB_TYPES
 export type EmbType = EmbTuple[number]
@@ -87,6 +98,6 @@ export let getEmbeddings = (embType: EmbType): OpenAIEmbeddingFunction | CohereE
     case "3a7b": return cohereConfig().ef
     case "88a2": return cohereConfig().ef
     case "7722": return cohereConfig().ef
-    default: throw new Error(`unknown embType ${embType}`)
+    default: return openAiConfig().ef
   }
 }

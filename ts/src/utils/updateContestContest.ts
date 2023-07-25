@@ -1,6 +1,5 @@
-import { DynamoDBDocumentClient, QueryCommand, ScanCommand, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
+import { DynamoDBDocumentClient, ScanCommand, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-
 
 let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
 

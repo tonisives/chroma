@@ -1,16 +1,17 @@
 import { DynamoDBDocumentClient, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
-import { config } from "./config.js";
+import { config, embNames } from "./config.js";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
 import { ddbDeleteEmbFromAllContests } from "./ddb.js";
 
 let { client } = config
 
 let collections = [
-  // "ah-00000000-3a7b-2023-06-dodo",
+  // contest - will remove em_stored from contests_2
+  `ah-00000000-${embNames.adaRecursive500}-2023-06-Index`,
 
   // -findings end: will delete only fc9d c_embs_s from ddb finding_7 contests
-  "ah-00000000-85ab-findings",
-  "ah-00000000-fc9d-findings",
+  // "ah-00000000-85ab-findings",
+  // "ah-00000000-fc9d-findings",
 
   // unused cohere (for now)
   // "ah-00000000-88a2-findings",
@@ -19,6 +20,7 @@ let collections = [
   // "ah-00000000-3a7b-findings",
   // "ah-00000000-8b70-findings",
 ]
+
 
 for (let collection of collections) {
   console.log(`deleting collection ${collection}`);
@@ -39,10 +41,7 @@ for (let collection of collections) {
           pk: `${contestName}`,
           sk: "0"
         },
-        UpdateExpression: "set em_stored = :em_stored",
-        ExpressionAttributeValues: {
-          ":em_stored": false
-        }
+        UpdateExpression: "remove em_stored",
       }
 
       let client = DynamoDBDocumentClient.from(new DynamoDBClient({}))
