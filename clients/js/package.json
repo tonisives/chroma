@@ -42,7 +42,8 @@
     "build:module": "tsc -p tsconfig.module.json",
     "genapi": "./genapi.sh",
     "prettier": "prettier --write .",
-    "release": "run-s build test:run && npm publish"
+    "release": "run-s build test:run && npm publish",
+    "prepack": "run-s build:main && run-s build:module"
   },
   "dependencies": {
     "isomorphic-fetch": "^3.0.0"

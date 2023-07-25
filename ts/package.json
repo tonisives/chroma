@@ -7,7 +7,7 @@
     "@aws-sdk/lib-dynamodb": "^3.338.0",
     "@aws-sdk/util-dynamodb": "^3.338.0",
     "add": "^2.0.6",
-    "chromadb": "tonisives/chroma#workspace=chromadb&commit=4107b6165d8ba41c1b690fe44002bee0cd17f52c",
+    "chromadb": "tonisives/chroma#workspace=chromadb&commit=a474092e8e0b5138cbb81b491959c296508de33c",
     "cohere-ai": "^6.2.2",
     "langchain": "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb",
     "markdown-it": "^13.0.1",
