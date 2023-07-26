@@ -5,15 +5,15 @@ let { client, collection_name, ef } = config
 
 let collection = await client.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-07-pooltogether",
-  name: "ah-00000000-3a7b-2023-07-amphora-protocol",
-  embeddingFunction: getEmbeddings("3a7b")
+  name: "ah-00000000-7f50-findings",
+  embeddingFunction: getEmbeddings("7f50")
 })
 
 console.log(`querying ${collection.name}'s ${await collection.count()} documents for token transfer`);
 
 let result = (await collection.query({
   nResults: 10,
-  queryTexts: ["can anyone create a position in setToken? Or is it privileged?"],
+  queryTexts: ["nftx"],
   // where: {
   //   c_name: {
   //     $eq: "2023-05-dodo"
