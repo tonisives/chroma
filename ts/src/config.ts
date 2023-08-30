@@ -2,14 +2,11 @@ import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
 
-export let CHROMA_URL = process.env.NGROK_URL
+export let CHROMA_URL = process.env.CHROMA_DB_URL
 if (process.env.AWS_PROFILE === "prod") {
-  CHROMA_URL = "http://54.189.40.202:8000"
   console.warn("WARN: PROD URL")
 }
 
-
-process.env.CHROMA_DB_URL = CHROMA_URL
 let client = new ChromaClient({ path: CHROMA_URL })
 export let contestName = "2023-05-Index"
 
