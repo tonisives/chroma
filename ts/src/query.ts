@@ -1,7 +1,7 @@
 import { QueryResponse } from "chromadb/dist/main/types.js";
-import { config, getEmbeddings } from "./config.js";
+import { config, getEmbeddings, oneYearBeforeTimestamp } from "./config.js";
 import { logMarkdown } from "./terminal.js";
-import Logger from "js-logger";
+import Logger from "jst-logger";
 
 let { client } = config
 
@@ -15,15 +15,33 @@ let delayIndex = 0
 const run = async () => {
   if (delayIndex > 0) await new Promise(resolve => setTimeout(resolve, 4000))
 
-  Logger.debug(`querying ${collection.name}'s ${await collection.count()} documents for token transfer`);
+  Logger.debug(`querying ${collection.name}'s ${await collection.count()} documents`);
 
   await new Promise(resolve => setTimeout(resolve, 1000 * delayIndex++))
 
   process.stdout.write(`|`)
 
-  let res = (await collection.query({
+  let res = queryLocal("  // The return value is not checked since the call will revert if any balance, allowance or\n      // receiver conditions fail.\n      i_LINK.transferFrom({from: msg.sender, to: address(this), value: amount});\n      emit AlerterRewardDeposited(amount, s_alerterRewardFunds);\n    ")
+
+  process.stdout.write(`-`)
+
+  if ((res as any).error) {
+    console.log(`error: ${(res as any).error}`);
+    process.exit(1)
+  }
+
+  return res
+}
+
+export const queryLocal = async (text: string) => {
+  let queryInput = {
     nResults: 10,
-    queryTexts: ["nftx"],
+    queryTexts: [text],
+    // where: {
+    //   c_name: {
+    //     $eq: "2023-07-perennial"
+    //   }
+    // }
     // where: {
     //   $or: [2, 3].map((it) => {
     //     return {
@@ -35,17 +53,30 @@ const run = async () => {
     // }
     // where: {
     //   c_date: {
-    //     $gt: 0
+    //     $gt: oneYearBeforeTimestamp
     //   }
     // }
-  }))
-
-  process.stdout.write(`-`)
-
-  if ((res as any).error) {
-    console.log(`error: ${(res as any).error}`);
-    process.exit(1)
+    where: {
+      $and: [
+        {
+          c_date: {
+            $gt: oneYearBeforeTimestamp
+          }
+        },
+        {
+          $or: [2, 3].map((it) => ({
+            severity: {
+              $eq: it
+            }
+          }))
+        }
+      ]
+    }
   }
+
+  Logger.debug(`Querying chromadb with ${JSON.stringify(queryInput, null, 2)}`)
+
+  let res = (await collection.query(queryInput))
 
   return res
 }
@@ -64,7 +95,8 @@ const runBatch = async () => {
   return await Promise.all(jobs)
 }
 
-runBatch().then(results => {
+run().then(results => {
+  printResult(results)
   process.exit(0)
 })
 
@@ -79,6 +111,6 @@ export const printResult = (result: QueryResponse) => {
     logMarkdown(result.documents[0][i] ?? "")
   }
 
-  let docLines = result.metadatas[0].map((it: any) => `${it.source} ${it.loc.lines.from}:${it.loc.lines.to}`).join("\n")
+  let docLines = result.metadatas[0].map((it: any) => `${it.c_name}:${it.source} ${it.locFrom}:${it.locTo} ${it.severity}`).join("\n")
   console.log(`\n\n${docLines}`)
 }

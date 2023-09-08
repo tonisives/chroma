@@ -1,6 +1,9 @@
 import crypto from "crypto"
 import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
 import { ChromaClient } from 'chromadb'
+import Logger from "jst-logger"
+
+Logger.useDefaults()
 
 export let CHROMA_URL = process.env.CHROMA_DB_URL
 if (process.env.AWS_PROFILE === "prod") {
@@ -99,3 +102,7 @@ export let getEmbeddings = (embType: EmbType): OpenAIEmbeddingFunction | CohereE
     default: return openAiConfig().ef
   }
 }
+
+let oneYearBefore = new Date()
+oneYearBefore.setFullYear(oneYearBefore.getFullYear() - 1)
+export let oneYearBeforeTimestamp = Math.floor(oneYearBefore.getTime() / 1000)

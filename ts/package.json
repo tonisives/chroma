@@ -10,6 +10,7 @@
     "chromadb": "^1.5.6",
     "cohere-ai": "^6.2.2",
     "js-logger": "https://github.com/tonisives/js-logger",
+    "jst-logger": "tonisives/js-logger#642ac8b0db52a8b2de35f4d4aa6f35486fd70d50",
     "langchain": "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb",
     "markdown-it": "^13.0.1",
     "markdown-it-terminal": "^0.4.0",

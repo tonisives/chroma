@@ -5,18 +5,26 @@ import { deleteEmbsS } from "./ddb.js";
 
 let { client } = config
 
+/**
+"85ab", // text-embedding-ada-002-recursive-split
+"7f50", // text-embedding-ada-002-recursive-split-500
+"fc9d", // text-embedding-ada-002-code-only
+ */
+
 let collection = await client.getCollection({
-  name: "ah-00000000-7f50-findings",
+  name: "ah-00000000-fc9d-findings",
   embeddingFunction: getEmbeddings("7f50")
 })
 
-await collection.delete({
+let res = await collection.delete({
   where: {
-    severity: {
-      $eq: 1
+    c_name: {
+      $eq: "2023-07-perennial"
     }
   }
 })
+
+console.log(`deleted ${res.length} documents`);
 
 process.exit(0)
 
