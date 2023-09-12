@@ -21,7 +21,20 @@ const run = async () => {
 
   process.stdout.write(`|`)
 
-  let res = queryLocal("  // The return value is not checked since the call will revert if any balance, allowance or\n      // receiver conditions fail.\n      i_LINK.transferFrom({from: msg.sender, to: address(this), value: amount});\n      emit AlerterRewardDeposited(amount, s_alerterRewardFunds);\n    ")
+  let res = await queryLocal(`// cannot unstake 0
+if (amount == 0) revert UnstakeZeroAmount();
+
+uint224 history = staker.history.latest();
+uint256 stakerPrincipal = uint256(history >> 112);
+uint256 stakedAt = uint112(history);
+// verify that the staker has enough staked LINK amount to unstake
+if (amount > stakerPrincipal) revert UnstakeExceedsPrincipal();
+
+uint256 updatedPrincipal = stakerPrincipal - amount;
+// in the case of a partial withdrawal, verify new staked LINK amount is above minimum
+if (amount < stakerPrincipal && updatedPrincipal < i_minPrincipalPerStaker) {
+  revert UnstakePrincipalBelowMinAmount();
+}`)
 
   process.stdout.write(`-`)
 

@@ -1,3 +1,4 @@
+import { QueryResponse } from "chromadb/dist/main/types.js"
 import { oneYearBeforeTimestamp } from "./config.js"
 import { logMarkdown } from "./terminal.js"
 
@@ -24,7 +25,7 @@ export type WebFinding = {
 }
 
 
-export const fetchFindingsWeb = async (query: string): Promise<WebFinding[]> => {
+export const queryWeb = async (query: string): Promise<QueryResponse> => {
   let embType = "7f50"
 
   let body = { index: `ah-00000000-${embType}-findings`, query: query, k: 10, date_from: oneYearBeforeTimestamp, severities: [2, 3] }
@@ -37,7 +38,24 @@ export const fetchFindingsWeb = async (query: string): Promise<WebFinding[]> => 
     "method": "POST"
   }).catch(e => { })
 
-  return await result!.json()
+  let findings: WebFinding[] = await result!.json()
+  let chromaRes: QueryResponse = {
+    documents: [],
+    metadatas: []
+  } as any
+
+  findings.forEach((it) => {
+    chromaRes.documents.push([it.content!])
+    chromaRes.metadatas.push([{
+      c_name: it.c_name ?? "",
+      source: it.url ?? "",
+      locFrom: it.loc.lines.from,
+      locTo: it.loc.lines.to,
+      severity: it.severity ?? 0
+    }])
+  })
+
+  return chromaRes
 }
 
 // print results
