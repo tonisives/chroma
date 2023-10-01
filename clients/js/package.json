@@ -1,6 +1,6 @@
 {
   "name": "chromadb",
-  "version": "1.5.6",
+  "version": "1.5.8",
   "description": "A JavaScript interface for chroma",
   "keywords": [],
   "author": "",
@@ -29,13 +29,16 @@
     "dist"
   ],
   "scripts": {
-    "test": "run-s db:clean db:run test:runfull db:clean",
+    "test": "run-s db:clean db:run test:runfull db:clean db:run-auth test:runfull-authonly db:clean",
     "test:set-port": "cross-env URL=localhost:8001",
-    "test:run": "jest --runInBand",
-    "test:runfull": "PORT=8001 jest --runInBand",
+    "test:run": "jest --runInBand --testPathIgnorePatterns=test/auth.basic.test.ts",
+    "test:run-auth": "jest --runInBand --testPathPattern=test/auth.basic.test.ts",
+    "test:runfull": "PORT=8001 jest --runInBand --testPathIgnorePatterns=test/auth.basic.test.ts",
+    "test:runfull-authonly": "PORT=8001 jest --runInBand --testPathPattern=test/auth.basic.test.ts",
     "test:update": "run-s db:clean db:run && jest --runInBand --updateSnapshot && run-s db:clean",
     "db:clean": "cd ../.. && CHROMA_PORT=8001 docker-compose -f docker-compose.test.yml down --volumes",
     "db:run": "cd ../.. && CHROMA_PORT=8001 docker-compose -f docker-compose.test.yml up --detach && sleep 5",
+    "db:run-auth": "cd ../.. && CHROMA_PORT=8001 docker-compose -f docker-compose.test-auth.yml up --detach && sleep 5",
     "clean": "rimraf dist",
     "build": "run-s clean build:*",
     "build:main": "tsc -p tsconfig.json",
@@ -43,9 +46,37 @@
     "genapi": "./genapi.sh",
     "prettier": "prettier --write .",
     "release": "run-s build test:run && npm publish",
-    "prepack": "run-s build:main && run-s build:module"
+    "prepack": "run-s build:main && run-s build:module",
+    "release_alpha": "run-s build test:run && npm publish --tag alpha"
+  },
+  "engines": {
+    "node": ">=14.17.0"
   },
   "dependencies": {
     "isomorphic-fetch": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@visheratin/web-ai": "^1.0.0",
+    "@visheratin/web-ai-node": "^1.0.0",
+    "@xenova/transformers": "^2.0.0",
+    "cohere-ai": "^6.0.0",
+    "openai": "^3.0.0 | ^4.0.0"
+  },
+  "peerDependenciesMeta": {
+    "@visheratin/web-ai": {
+      "optional": true
+    },
+    "@visheratin/web-ai-node": {
+      "optional": true
+    },
+    "@xenova/transformers": {
+      "optional": true
+    },
+    "cohere-ai": {
+      "optional": true
+    },
+    "openai": {
+      "optional": true
+    }
   }
 }
