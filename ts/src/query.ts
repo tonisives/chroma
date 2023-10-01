@@ -2,13 +2,15 @@ import { QueryResponse } from "chromadb/dist/main/types.js";
 import { config, getEmbeddings, oneYearBeforeTimestamp } from "./config.js";
 import { logMarkdown } from "./terminal.js";
 import Logger from "jst-logger";
+import { queryWeb } from "./query.web.js";
 
 let { client } = config
 
 let collection = await client.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-07-pooltogether",
-  name: "ah-00000000-7f50-findings",
-  embeddingFunction: getEmbeddings("7f50")
+  name: "ah-00000000-8a3f-findings",
+  // name: "ah-00000000-8a3f-2023-09-maia-dao-ulysses",
+  embeddingFunction: getEmbeddings("8a3f")
 })
 
 let delayIndex = 0
@@ -21,20 +23,7 @@ const run = async () => {
 
   process.stdout.write(`|`)
 
-  let res = await queryLocal(`// cannot unstake 0
-if (amount == 0) revert UnstakeZeroAmount();
-
-uint224 history = staker.history.latest();
-uint256 stakerPrincipal = uint256(history >> 112);
-uint256 stakedAt = uint112(history);
-// verify that the staker has enough staked LINK amount to unstake
-if (amount > stakerPrincipal) revert UnstakeExceedsPrincipal();
-
-uint256 updatedPrincipal = stakerPrincipal - amount;
-// in the case of a partial withdrawal, verify new staked LINK amount is above minimum
-if (amount < stakerPrincipal && updatedPrincipal < i_minPrincipalPerStaker) {
-  revert UnstakePrincipalBelowMinAmount();
-}`)
+  let res = await queryLocal(`Ulysses`)
 
   process.stdout.write(`-`)
 
@@ -51,8 +40,8 @@ export const queryLocal = async (text: string) => {
     nResults: 10,
     queryTexts: [text],
     // where: {
-    //   c_name: {
-    //     $eq: "2023-07-perennial"
+    //   type: {
+    //     $eq: 0
     //   }
     // }
     // where: {
@@ -69,22 +58,22 @@ export const queryLocal = async (text: string) => {
     //     $gt: oneYearBeforeTimestamp
     //   }
     // }
-    where: {
-      $and: [
-        {
-          c_date: {
-            $gt: oneYearBeforeTimestamp
-          }
-        },
-        {
-          $or: [2, 3].map((it) => ({
-            severity: {
-              $eq: it
-            }
-          }))
-        }
-      ]
-    }
+    // where: {
+    //   $and: [
+    //     {
+    //       c_date: {
+    //         $gt: oneYearBeforeTimestamp
+    //       }
+    //     },
+    //     {
+    //       $or: [2, 3].map((it) => ({
+    //         severity: {
+    //           $eq: it
+    //         }
+    //       }))
+    //     }
+    //   ]
+    // }
   }
 
   Logger.debug(`Querying chromadb with ${JSON.stringify(queryInput, null, 2)}`)
@@ -122,8 +111,9 @@ export const printResult = (result: QueryResponse) => {
     // ${result.metadatas[0][i].loc.lines.from}:${result.metadatas[0][i].loc.lines.to}`)
     logMarkdown(`# ${i}.`)
     logMarkdown(result.documents[0][i] ?? "")
+    console.log(`${JSON.stringify(result.metadatas[0][i], null, 2)}`)
   }
 
-  let docLines = result.metadatas[0].map((it: any) => `${it.c_name}:${it.source} ${it.locFrom}:${it.locTo} ${it.severity}`).join("\n")
+  let docLines = result.metadatas[0].map((it: any) => `${it.source} ${it.locFrom}:${it.locTo} ${it.severity} `).join("\n")
   console.log(`\n\n${docLines}`)
 }

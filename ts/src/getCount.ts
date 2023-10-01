@@ -5,7 +5,7 @@ let { client, collection_name, ef } = config
 console.log(`getting collection count`)
 
 let collection = await client.getCollection({
-  name: "ah-00000000-fe50-2023-07-amphora-protocol",
+  name: "ah-00000000-8a3f-2023-09-ditto",
 })
 
 console.log(`getting count for ${collection.name}`)
@@ -16,5 +16,7 @@ let result = await collection.count().catch((e) => {
 })
 
 console.log(`count: ${result}`);
+
+console.log(`sample ${JSON.stringify(await collection.peek({ limit: 4 }), null, 2)}`)
 
 process.exit(0)
