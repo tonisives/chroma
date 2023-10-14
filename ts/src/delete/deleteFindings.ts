@@ -1,7 +1,7 @@
 import { DynamoDBDocumentClient, UpdateCommand, UpdateCommandInput } from "@aws-sdk/lib-dynamodb";
-import { EmbType, config, getEmbeddings } from "./config.js";
+import { EmbType, config, getEmbeddings } from "../config.js";
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
-import { deleteEmbsS } from "./ddb.js";
+import { deleteEmbsS } from "../ddb.js";
 
 let { client } = config
 
@@ -23,11 +23,6 @@ let res = await collection.delete({
     }
   }
 })
-
-console.log(`deleted ${res.length} documents`);
-
-process.exit(0)
-
 
 let contestNames = ["2022-08-prepo",
   "2022-09-nouns-builder"]

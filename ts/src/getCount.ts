@@ -5,7 +5,7 @@ let { client, collection_name, ef } = config
 console.log(`getting collection count`)
 
 let collection = await client.getCollection({
-  name: "ah-00000000-f059-findings",
+  name: "ah-00000000-8a3f-2023-10-zksync-era",
 })
 
 console.log(`getting count for ${collection.name}`)
