@@ -18,21 +18,22 @@ let res = await collection.delete({
   }
 })
 
-await deleteDEmbsS(contest, "0000")
+await deleteDEmbsS(contest.split("-").slice(3).join("-"), "0")
 
-async function deleteDEmbsS(contestName: string, embType: EmbType, index: number = -1) {
+async function deleteDEmbsS(contestName: string, embType: string, index: number = -1) {
+  console.log(`deleting d_embs_s ${embType} from ${contestName}`);
+
   try {
     let table = "ah_contest_2";
 
     let input: UpdateCommandInput = {
       TableName: table,
       Key: {
-        pk: `${contestName}`,
-        sk: "0"
+        pk: `${contestName}`
       },
-      UpdateExpression: "delete d_embs_s :embs_s",
+      UpdateExpression: "delete d_embs_s :d_embs_s",
       ExpressionAttributeValues: {
-        ":embs_s": new Set([embType])
+        ":d_embs_s": new Set([embType])
       }
     };
 
