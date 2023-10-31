@@ -8,7 +8,7 @@ let { client } = config
 
 let collection = await client.getOrCreateCollection({
   // name: "ah-00000000-3a7b-2023-07-pooltogether",
-  name: "ah-00000000-8a3f-findings",
+  name: "ah-00000000-8a3f-2023-10-the-wildcat-protocol",
   // name: "ah-00000000-8a3f-2023-09-maia-dao-ulysses",
   embeddingFunction: getEmbeddings("8a3f")
 })
@@ -39,11 +39,23 @@ export const queryLocal = async (text: string) => {
   let queryInput = {
     nResults: 10,
     queryTexts: [text],
-    // where: {
-    //   type: {
-    //     $eq: 0
-    //   }
-    // }
+    where: {
+      type: {
+        $eq: 2
+      }
+      // $and: [
+      //   {
+      //     type: {
+      //       $eq: 2
+      //     }
+      //   },
+      //   {
+      //     source: {
+      //       $eq: "https://wildcat-protocol.gitbook.io"
+      //     }
+      //   }
+      // ]
+    }
     // where: {
     //   $or: [2, 3].map((it) => {
     //     return {
