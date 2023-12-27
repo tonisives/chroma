@@ -1,34 +1,34 @@
-import { QueryResponse } from "chromadb/dist/main/types.js";
-import { config, getEmbeddings, oneYearBeforeTimestamp } from "./config.js";
-import { logMarkdown } from "./terminal.js";
-import Logger from "jst-logger";
-import { queryWeb } from "./query.web.js";
+import { QueryResponse } from "chromadb"
+import { config, getEmbeddings, oneYearBeforeTimestamp } from "./config.js"
+import { logMarkdown } from "./terminal.js"
+import Logger from "jst-logger"
 
 let { client } = config
 
 let collection = await client.getOrCreateCollection({
-  // name: "ah-00000000-3a7b-2023-07-pooltogether",
-  name: "ah-00000000-8a3f-2023-10-the-wildcat-protocol",
+  name: "ah-00000000-8a3f-2023-12-ethereum-credit-guild",
   // name: "ah-00000000-8a3f-2023-09-maia-dao-ulysses",
-  embeddingFunction: getEmbeddings("8a3f")
+  embeddingFunction: getEmbeddings("8a3f"),
 })
 
 let delayIndex = 0
 const run = async () => {
-  if (delayIndex > 0) await new Promise(resolve => setTimeout(resolve, 4000))
+  if (delayIndex > 0) await new Promise((resolve) => setTimeout(resolve, 4000))
 
-  Logger.debug(`querying ${collection.name}'s ${await collection.count()} documents`);
+  Logger.debug(
+    `querying ${collection.name}'s ${await collection.count()} documents`
+  )
 
-  await new Promise(resolve => setTimeout(resolve, 1000 * delayIndex++))
+  await new Promise((resolve) => setTimeout(resolve, 1000 * delayIndex++))
 
   process.stdout.write(`|`)
 
-  let res = await queryLocal(`Ulysses`)
+  let res = await queryLocal(`info`)
 
   process.stdout.write(`-`)
 
   if ((res as any).error) {
-    console.log(`error: ${(res as any).error}`);
+    console.log(`error: ${(res as any).error}`)
     process.exit(1)
   }
 
@@ -37,12 +37,12 @@ const run = async () => {
 
 export const queryLocal = async (text: string) => {
   let queryInput = {
-    nResults: 10,
+    nResults: 1000,
     queryTexts: [text],
     where: {
       type: {
-        $eq: 2
-      }
+        $eq: 0,
+      },
       // $and: [
       //   {
       //     type: {
@@ -55,7 +55,7 @@ export const queryLocal = async (text: string) => {
       //     }
       //   }
       // ]
-    }
+    },
     // where: {
     //   $or: [2, 3].map((it) => {
     //     return {
@@ -90,7 +90,7 @@ export const queryLocal = async (text: string) => {
 
   Logger.debug(`Querying chromadb with ${JSON.stringify(queryInput, null, 2)}`)
 
-  let res = (await collection.query(queryInput))
+  let res = await collection.query(queryInput)
 
   return res
 }
@@ -98,8 +98,8 @@ export const queryLocal = async (text: string) => {
 const runBatch = async () => {
   let jobs = []
   for (let i = 0; i < 5; i++) {
-    let result = run().catch(e => {
-      console.log(`error: ${(result as any).error}`);
+    let result = run().catch((e) => {
+      console.log(`error: ${(result as any).error}`)
       process.exit(1)
     })
 
@@ -109,7 +109,7 @@ const runBatch = async () => {
   return await Promise.all(jobs)
 }
 
-run().then(results => {
+run().then((results) => {
   printResult(results)
   process.exit(0)
 })
@@ -126,6 +126,8 @@ export const printResult = (result: QueryResponse) => {
     console.log(`${JSON.stringify(result.metadatas[0][i], null, 2)}`)
   }
 
-  let docLines = result.metadatas[0].map((it: any) => `${it.source} ${it.locFrom}:${it.locTo} ${it.severity} `).join("\n")
+  let docLines = result.metadatas[0]
+    .map((it: any) => `${it.source} ${it.locFrom}:${it.locTo} ${it.severity} `)
+    .join("\n")
   console.log(`\n\n${docLines}`)
 }

@@ -14,7 +14,7 @@
     "langchain": "https://github.com/tonisives/langchainjs.git#workspace=langchain&commit=9af90c9161b70d4b0384ea5d86ce5fc93145adeb",
     "markdown-it": "^13.0.1",
     "markdown-it-terminal": "^0.4.0",
-    "openai": "^3.2.1"
+    "openai": "^4.24.0"
   },
   "devDependencies": {
     "@types/node": "^20.5.1",

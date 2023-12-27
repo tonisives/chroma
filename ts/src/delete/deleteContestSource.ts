@@ -7,7 +7,29 @@ import { config, getEmbeddings } from "../config.js"
 import { DynamoDBClient } from "@aws-sdk/client-dynamodb"
 
 let { client } = config
-let contest = "ah-00000000-8a3f-2023-11-zetachain"
+
+let contest = process.argv[2]
+
+if (!contest) {
+  console.log("Please input contest name")
+  process.exit(1)
+}
+
+let input = await new Promise((resolve) => {
+  process.stdout.write(`delete ${contest} source code embs (type 0)? (y/n) `)
+  process.stdin.on("data", (data) => {
+    resolve(data.toString().trim())
+  })
+})
+
+if (input !== "y") {
+  console.log("not deleting")
+  process.exit(0)
+}
+
+contest = `ah-00000000-8a3f-${contest}`
+
+console.log(`deleting ${contest} source code embs (type 0)`)
 
 let collection = await client.getCollection({
   name: contest,
@@ -17,16 +39,16 @@ let collection = await client.getCollection({
 let res = await collection.delete({
   where: {
     type: {
-      $eq: 2,
+      $eq: 0,
     },
   },
 })
 
 console.log("delete res", res)
 
-await deleteDEmbsS(contest.split("-").slice(3).join("-"), "0")
+await deleteEmStored(contest.split("-").slice(3).join("-"), "0")
 
-async function deleteDEmbsS(
+async function deleteEmStored(
   contestName: string,
   embType: string,
   index: number = -1
@@ -41,9 +63,9 @@ async function deleteDEmbsS(
       Key: {
         pk: `${contestName}`,
       },
-      UpdateExpression: "delete d_embs_s :d_embs_s",
+      UpdateExpression: "set em_stored :em_stored",
       ExpressionAttributeValues: {
-        ":d_embs_s": new Set([embType]),
+        ":em_stored": 0,
       },
     }
 
