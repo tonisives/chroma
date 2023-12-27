@@ -46,7 +46,8 @@ let res = await collection.delete({
 
 console.log("delete res", res)
 
-await deleteEmStored(contest.split("-").slice(3).join("-"), "0")
+// you can use util-runs in docs-ai to ignore em-stored check
+// await deleteEmStored(contest.split("-").slice(3).join("-"), "0")
 
 async function deleteEmStored(
   contestName: string,
