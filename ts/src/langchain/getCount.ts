@@ -1,19 +1,19 @@
-import { config } from "../config.js";
+import { config } from "../config.js"
 import { Chroma } from "langchain/vectorstores/chroma"
-import { lcEmbeddings } from "./conf.js";
+import { lcEmbeddings } from "./conf.js"
 
 let { client, collection_name, ef } = config
 
-console.log("start");
+console.log("start")
 
 const chroma = new Chroma(lcEmbeddings.embeddings(), {
-  collectionName: "ah-00000000-85ab-findings",
+  collectionName: "ah-00000000-85ab-2023-12-ubiquity",
   url: process.env.CHROMA_DB_URL,
 })
 
 await chroma.ensureCollection()
 let count = await chroma.collection?.count()
 
-console.log(`done. ${count}`);
+console.log(`done. ${count}`)
 
 process.exit(0)

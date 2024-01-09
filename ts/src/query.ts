@@ -6,7 +6,7 @@ import Logger from "jst-logger"
 let { client } = config
 
 let collection = await client.getOrCreateCollection({
-  name: "ah-00000000-8a3f-2023-12-ethereum-credit-guild",
+  name: "ah-00000000-8a3f-2023-12-olas",
   // name: "ah-00000000-8a3f-2023-09-maia-dao-ulysses",
   embeddingFunction: getEmbeddings("8a3f"),
 })
