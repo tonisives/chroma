@@ -1,6 +1,6 @@
 import crypto from "crypto"
-import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from 'chromadb'
-import { ChromaClient } from 'chromadb'
+import { CohereEmbeddingFunction, OpenAIEmbeddingFunction } from "chromadb"
+import { ChromaClient } from "chromadb"
 import Logger from "jst-logger"
 
 Logger.useDefaults()
@@ -10,19 +10,27 @@ if (process.env.AWS_PROFILE === "prod") {
   console.warn("WARN: PROD URL")
 }
 
-let client = new ChromaClient({ path: CHROMA_URL })
+let client = new ChromaClient({
+  path: CHROMA_URL,
+  auth: {
+    provider: "token",
+    credentials: process.env.CHROMA_AUTH_TOKEN!,
+    providerOptions: { headerType: "X_CHROMA_TOKEN" },
+  },
+})
+
 export let contestName = "2023-05-Index"
 
 console.log(`CHROMA_URL ${CHROMA_URL}`)
 console.log(`AWS_PROFILE ${process.env.AWS_PROFILE}`)
 
 export const calcHash = (input: string) => {
-  return crypto.createHash('sha256').update(input).digest('hex').slice(0, 4)
+  return crypto.createHash("sha256").update(input).digest("hex").slice(0, 4)
 }
 
 export type Config = {
-  client: ChromaClient,
-  collection_name: string,
+  client: ChromaClient
+  collection_name: string
   ef: OpenAIEmbeddingFunction | CohereEmbeddingFunction
 }
 
@@ -32,17 +40,15 @@ const openAiConfig = (): Config => {
 
   let collection_name = `ah-00000000-${model_hash}-${contestName}`
 
-  let ef = new OpenAIEmbeddingFunction(
-    {
-      openai_api_key: process.env.OPENAI_TOKEN ?? "",
-      openai_model: model_name
-    }
-  )
+  let ef = new OpenAIEmbeddingFunction({
+    openai_api_key: process.env.OPENAI_TOKEN ?? "",
+    openai_model: model_name,
+  })
 
   return {
     client,
     collection_name,
-    ef
+    ef,
   }
 }
 
@@ -54,16 +60,15 @@ const cohereConfig = () => {
 
   let ef = new CohereEmbeddingFunction({
     cohere_api_key: process.env.COHERE_TOKEN ?? "",
-    model: "large"
+    model: "large",
   })
 
   return {
     client,
     collection_name,
-    ef
+    ef,
   }
 }
-
 
 export let config = cohereConfig()
 
@@ -86,20 +91,29 @@ export const ALL_EMB_TYPES = [
   embNames.adaCodeOnly,
   embNames.cohereFull,
   embNames.cohereRecursive,
-  embNames.cohereCodeOnly
+  embNames.cohereCodeOnly,
 ]
 export type EmbTuple = typeof ALL_EMB_TYPES
 export type EmbType = EmbTuple[number]
 
-export let getEmbeddings = (embType: EmbType): OpenAIEmbeddingFunction | CohereEmbeddingFunction => {
+export let getEmbeddings = (
+  embType: EmbType
+): OpenAIEmbeddingFunction | CohereEmbeddingFunction => {
   switch (embType) {
-    case "8b70": return openAiConfig().ef
-    case "85ab": return openAiConfig().ef
-    case "fc9d": return openAiConfig().ef
-    case "3a7b": return cohereConfig().ef
-    case "88a2": return cohereConfig().ef
-    case "7722": return cohereConfig().ef
-    default: return openAiConfig().ef
+    case "8b70":
+      return openAiConfig().ef
+    case "85ab":
+      return openAiConfig().ef
+    case "fc9d":
+      return openAiConfig().ef
+    case "3a7b":
+      return cohereConfig().ef
+    case "88a2":
+      return cohereConfig().ef
+    case "7722":
+      return cohereConfig().ef
+    default:
+      return openAiConfig().ef
   }
 }
 

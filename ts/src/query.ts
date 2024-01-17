@@ -1,5 +1,5 @@
 import { QueryResponse } from "chromadb"
-import { config, getEmbeddings, oneYearBeforeTimestamp } from "./config.js"
+import { config, getEmbeddings } from "./config.js"
 import { logMarkdown } from "./terminal.js"
 import Logger from "jst-logger"
 
@@ -37,7 +37,7 @@ const run = async () => {
 
 export const queryLocal = async (text: string) => {
   let queryInput = {
-    nResults: 1000,
+    nResults: 20,
     queryTexts: [text],
     where: {
       type: {

@@ -34,7 +34,7 @@ if (input !== "y") {
 
 console.log(`deleting collection ${collectionName} with DDB ${withDdb}`)
 
-await client.deleteCollection({ name: collectionName })
+// await client.deleteCollection({ name: collectionName })
 
 /* let collection = await client.getOrCreateCollection({ name: collectionName })
   await collection.delete({}).catch(e => {
@@ -43,7 +43,7 @@ await client.deleteCollection({ name: collectionName })
   }) */
 
 if (!withDdb) {
-  console.log("done")
+  console.log("not deleting from ddb")
   process.exit(0)
 }
 

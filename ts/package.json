@@ -1,13 +1,12 @@
 {
   "type": "module",
   "name": "ts",
-  "packageManager": "yarn@3.5.0",
   "dependencies": {
     "@aws-sdk/client-dynamodb": "^3.338.0",
     "@aws-sdk/lib-dynamodb": "^3.338.0",
     "@aws-sdk/util-dynamodb": "^3.338.0",
     "add": "^2.0.6",
-    "chromadb": "^1.5.6",
+    "chromadb": "^1.7.3",
     "cohere-ai": "^6.2.2",
     "js-logger": "https://github.com/tonisives/js-logger",
     "jst-logger": "tonisives/js-logger#642ac8b0db52a8b2de35f4d4aa6f35486fd70d50",
